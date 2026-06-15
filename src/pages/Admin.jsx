@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   FiDownload, FiUpload, FiRefreshCw, FiPlus, FiTrash2,
@@ -219,23 +219,33 @@ function AdminHero() {
   const { data, updateHero } = useData()
   const { addToast } = useToast()
   const [form, setForm] = useState({ ...data.hero })
+  const [uploading, setUploading] = useState(false)
+  const fileRef = useRef(null)
 
   useEffect(() => { setForm({ ...data.hero }) }, [data.hero])
 
   const handleSave = () => { updateHero(form); addToast('Hero berhasil diperbarui', 'success') }
 
-  const updateImage = (index, val) => {
-    const images = [...(form.images || [])]
-    images[index] = val
-    setForm({ ...form, images })
-  }
-
-  const addImage = () => {
-    setForm({ ...form, images: [...(form.images || []), ''] })
+  const handleFiles = async (files) => {
+    const valid = Array.from(files).filter(f => f.type.startsWith('image/'))
+    if (valid.length === 0) return
+    setUploading(true)
+    const results = await Promise.allSettled(valid.map(f => compressImage(f)))
+    const urls = results.filter(r => r.status === 'fulfilled').map(r => r.value)
+    setForm(prev => ({ ...prev, images: [...(prev.images || []), ...urls] }))
+    setUploading(false)
+    if (fileRef.current) fileRef.current.value = ''
   }
 
   const removeImage = (index) => {
-    const images = form.images.filter((_, i) => i !== index)
+    setForm(prev => ({ ...prev, images: prev.images.filter((_, i) => i !== index) }))
+  }
+
+  const reorderImage = (index, dir) => {
+    const images = [...(form.images || [])]
+    const target = index + dir
+    if (target < 0 || target >= images.length) return
+    ;[images[index], images[target]] = [images[target], images[index]]
     setForm({ ...form, images })
   }
 
@@ -252,29 +262,26 @@ function AdminHero() {
         </div>
         <div>
           <label className={labelClass}>Gambar Slider Hero</label>
-          <div className="space-y-3">
+          <div className="flex flex-wrap gap-3 mb-3">
             {(form.images || []).map((img, i) => (
-              <div key={i} className="flex items-start gap-2">
-                <div className="flex-1">
-                  <ImageFieldInput
-                    value={img}
-                    onChange={(val) => updateImage(i, val)}
-                  />
+              <div key={i} className="relative group w-32 h-20 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-600">
+                <img src={img} alt="" className="w-full h-full object-cover" onError={e => { e.target.style.display = 'none' }} />
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
+                  <button onClick={() => reorderImage(i, -1)} disabled={i === 0} className="p-1 bg-white/80 rounded-lg disabled:opacity-30"><FiChevronUp size={14} /></button>
+                  <button onClick={() => removeImage(i)} className="p-1 bg-red-500 rounded-lg"><FiX size={14} className="text-white" /></button>
+                  <button onClick={() => reorderImage(i, 1)} disabled={i === form.images.length - 1} className="p-1 bg-white/80 rounded-lg disabled:opacity-30"><FiChevronDown size={14} /></button>
                 </div>
-                <button
-                  onClick={() => removeImage(i)}
-                  className="mt-2 px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
-                >
-                  Hapus
-                </button>
               </div>
             ))}
-            <button
-              onClick={addImage}
-              className="text-xs text-honda-red hover:text-red-700 transition-colors"
-            >
-              + Tambah gambar
-            </button>
+          </div>
+          <div
+            onClick={() => fileRef.current?.click()}
+            className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl py-6 text-center cursor-pointer hover:border-honda-red hover:bg-honda-red/5 transition-all"
+          >
+            <input ref={fileRef} type="file" multiple accept="image/*" onChange={e => handleFiles(e.target.files)} className="hidden" />
+            <FiImage className="mx-auto mb-2 text-gray-400" size={28} />
+            <p className="text-sm text-gray-500 dark:text-gray-400">{uploading ? 'Memproses...' : 'Klik atau drag & drop banyak gambar sekaligus'}</p>
+            <p className="text-xs text-gray-400 mt-1">Bisa pilih beberapa file sekali klik</p>
           </div>
         </div>
         <div>
