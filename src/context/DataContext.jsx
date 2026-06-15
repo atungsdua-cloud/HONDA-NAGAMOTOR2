@@ -1,6 +1,7 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react'
 import { products as defaultProducts, promotions as defaultPromotions, testimonials as defaultTestimonials, gallery as defaultGallery, faqs as defaultFaqs, advantages as defaultAdvantages } from '../data'
 
+const API_ENDPOINT = '/api/data'
 const STORAGE_KEY = 'honda-cms-data'
 
 const defaultData = {
@@ -82,60 +83,88 @@ function mergeArray(defaults, saved, deleted, idKey = 'id') {
   return merged
 }
 
-function loadData() {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY)
-    if (saved) {
-      const parsed = JSON.parse(saved)
-      const deleted = parsed._deleted || []
-      const merged = { ...defaultData, ...parsed, _deleted: deleted }
-      if (merged.navbar?.menuItems) {
-        merged.navbar.menuItems = merged.navbar.menuItems.filter(
-          item => !/kredit/i.test(item.label) && !/kredit/i.test(item.section || '')
-        )
-      }
-      merged.products = mergeArray(defaultData.products, parsed.products, deleted)
-      merged.promotions = mergeArray(defaultData.promotions, parsed.promotions, deleted)
-      merged.testimonials = mergeArray(defaultData.testimonials, parsed.testimonials, deleted)
-      merged.gallery = mergeArray(defaultData.gallery, parsed.gallery, deleted)
-      merged.faqs = mergeArray(defaultData.faqs, parsed.faqs, deleted)
-      merged.advantages = mergeArray(defaultData.advantages, parsed.advantages, deleted)
-      return merged
-    }
-  } catch (e) {
-    console.warn('Failed to load saved data, using defaults')
+function mergeData(saved) {
+  if (!saved) return defaultData
+  const deleted = saved._deleted || []
+  const merged = { ...defaultData, ...saved, _deleted: deleted }
+  if (merged.navbar?.menuItems) {
+    merged.navbar.menuItems = merged.navbar.menuItems.filter(
+      item => !/kredit/i.test(item.label) && !/kredit/i.test(item.section || '')
+    )
   }
-  return defaultData
+  merged.products = mergeArray(defaultData.products, saved.products, deleted)
+  merged.promotions = mergeArray(defaultData.promotions, saved.promotions, deleted)
+  merged.testimonials = mergeArray(defaultData.testimonials, saved.testimonials, deleted)
+  merged.gallery = mergeArray(defaultData.gallery, saved.gallery, deleted)
+  merged.faqs = mergeArray(defaultData.faqs, saved.faqs, deleted)
+  merged.advantages = mergeArray(defaultData.advantages, saved.advantages, deleted)
+  return merged
 }
 
-function saveData(data) {
+function loadLocal() {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
-  } catch (e) {
-    console.warn('Failed to save data to localStorage')
-  }
+    const saved = localStorage.getItem(STORAGE_KEY)
+    if (saved) return mergeData(JSON.parse(saved))
+  } catch {}
+  return defaultData
 }
 
 const DataContext = createContext(null)
 
 export function DataProvider({ children }) {
-  const [data, setData] = useState(loadData)
+  const [data, setData] = useState(defaultData)
   const [lastUpdate, setLastUpdate] = useState(Date.now())
   const [saveError, setSaveError] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const saveTimer = useRef(null)
+  const initialized = useRef(false)
 
   useEffect(() => {
+    if (initialized.current) return
+    initialized.current = true
+    ;(async () => {
+      try {
+        const res = await fetch(API_ENDPOINT)
+        if (res.ok) {
+          const saved = await res.json()
+          if (saved && Object.keys(saved).length > 0) {
+            setData(mergeData(saved))
+            setLoading(false)
+            return
+          }
+        }
+      } catch {}
+      setData(loadLocal())
+      setLoading(false)
+    })()
+  }, [])
+
+  useEffect(() => {
+    if (loading) return
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
-      if (saveError) setSaveError(null)
-    } catch (e) {
-      console.warn('Failed to save data to localStorage')
-      setSaveError('Penyimpanan lokal penuh. Hapus beberapa gambar atau gunakan resolusi lebih kecil.')
-    }
-  }, [data])
+    } catch {}
+    if (saveTimer.current) clearTimeout(saveTimer.current)
+    saveTimer.current = setTimeout(async () => {
+      try {
+        const res = await fetch(API_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        })
+        if (res.ok) {
+          if (saveError) setSaveError(null)
+        } else {
+          setSaveError('Gagal menyimpan ke server.')
+        }
+      } catch {
+        setSaveError('Server tidak tersedia. Data disimpan di browser saja.')
+      }
+    }, 1000)
+    return () => { if (saveTimer.current) clearTimeout(saveTimer.current) }
+  }, [data, loading])
 
-  const getByType = useCallback((type) => {
-    return data[type] || []
-  }, [data])
+  const getByType = useCallback((type) => data[type] || [], [data])
 
   const getByTypeAndId = useCallback((type, id) => {
     const items = data[type] || []
@@ -190,9 +219,7 @@ export function DataProvider({ children }) {
     setLastUpdate(Date.now())
   }, [])
 
-  const exportData = useCallback(() => {
-    return JSON.stringify(data, null, 2)
-  }, [data])
+  const exportData = useCallback(() => JSON.stringify(data, null, 2), [data])
 
   const importData = useCallback((jsonStr) => {
     try {
@@ -200,9 +227,7 @@ export function DataProvider({ children }) {
       setData(prev => ({ ...prev, ...parsed }))
       setLastUpdate(Date.now())
       return true
-    } catch (e) {
-      return false
-    }
+    } catch { return false }
   }, [])
 
   const updateProfile = useCallback((updates) => {
@@ -229,6 +254,7 @@ export function DataProvider({ children }) {
   return (
     <DataContext.Provider value={{
       data,
+      loading,
       lastUpdate,
       saveError,
       getByType,

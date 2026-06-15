@@ -5,10 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && node -e \"require('fs').copyFileSync('dist/index.html','dist/200.html')\"",
+    "build": "vite build",
+    "start": "node server.js",
     "preview": "vite preview"
   },
   "dependencies": {
+    "express": "^5.2.1",
     "framer-motion": "^12.10.5",
     "react": "^19.1.0",
     "react-countup": "^6.5.3",
