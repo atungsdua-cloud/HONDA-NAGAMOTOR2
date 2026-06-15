@@ -276,12 +276,14 @@ function AdminHero() {
           </div>
           <div
             onClick={() => fileRef.current?.click()}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={(e) => { e.preventDefault(); handleFiles(e.dataTransfer.files) }}
             className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl py-6 text-center cursor-pointer hover:border-honda-red hover:bg-honda-red/5 transition-all"
           >
             <input ref={fileRef} type="file" multiple accept="image/*" onChange={e => handleFiles(e.target.files)} className="hidden" />
             <FiImage className="mx-auto mb-2 text-gray-400" size={28} />
             <p className="text-sm text-gray-500 dark:text-gray-400">{uploading ? 'Memproses...' : 'Klik atau drag & drop banyak gambar sekaligus'}</p>
-            <p className="text-xs text-gray-400 mt-1">Bisa pilih beberapa file sekali klik</p>
+            <p className="text-xs text-gray-400 mt-1">Bisa pilih beberapa file sekali klik — tahan Ctrl/Shift untuk multi-pilih</p>
           </div>
         </div>
         <div>
