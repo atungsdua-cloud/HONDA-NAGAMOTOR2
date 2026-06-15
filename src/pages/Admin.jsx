@@ -224,6 +224,21 @@ function AdminHero() {
 
   const handleSave = () => { updateHero(form); addToast('Hero berhasil diperbarui', 'success') }
 
+  const updateImage = (index, val) => {
+    const images = [...(form.images || [])]
+    images[index] = val
+    setForm({ ...form, images })
+  }
+
+  const addImage = () => {
+    setForm({ ...form, images: [...(form.images || []), ''] })
+  }
+
+  const removeImage = (index) => {
+    const images = form.images.filter((_, i) => i !== index)
+    setForm({ ...form, images })
+  }
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl p-4 sm:p-6 border border-gray-200 dark:border-gray-700">
       <div className="space-y-4 max-w-2xl">
@@ -234,6 +249,33 @@ function AdminHero() {
         <div>
           <label className={labelClass}>Sub Judul</label>
           <textarea rows={2} value={form.subtitle} onChange={e => setForm({ ...form, subtitle: e.target.value })} className={`${inputClass} resize-none`} />
+        </div>
+        <div>
+          <label className={labelClass}>Gambar Slider Hero</label>
+          <div className="space-y-3">
+            {(form.images || []).map((img, i) => (
+              <div key={i} className="flex items-start gap-2">
+                <div className="flex-1">
+                  <ImageFieldInput
+                    value={img}
+                    onChange={(val) => updateImage(i, val)}
+                  />
+                </div>
+                <button
+                  onClick={() => removeImage(i)}
+                  className="mt-2 px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
+                >
+                  Hapus
+                </button>
+              </div>
+            ))}
+            <button
+              onClick={addImage}
+              className="text-xs text-honda-red hover:text-red-700 transition-colors"
+            >
+              + Tambah gambar
+            </button>
+          </div>
         </div>
         <div>
           <label className={labelClass}>Foto Sales (PNG)</label>

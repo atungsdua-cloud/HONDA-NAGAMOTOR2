@@ -27,6 +27,11 @@ const defaultData = {
     title: 'Temukan Honda Impian Anda Hari Ini Bersama Saya Aldi Nagamotor',
     subtitle: 'Promo terbaik, DP ringan, proses cepat, dan pelayanan profesional dari sales berpengalaman.',
     salesPhoto: '',
+    images: [
+      'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=1600&q=80',
+      'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=1600&q=80',
+      'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=1600&q=80',
+    ],
     stats: [
       { value: 500, suffix: '+', label: 'Unit Terjual' },
       { value: 1000, suffix: '+', label: 'Konsumen Puas' },
@@ -86,7 +91,16 @@ function mergeArray(defaults, saved, deleted, idKey = 'id') {
 function mergeData(saved) {
   if (!saved) return defaultData
   const deleted = saved._deleted || []
-  const merged = { ...defaultData, ...saved, _deleted: deleted }
+  const merged = {
+    ...defaultData,
+    ...saved,
+    hero: { ...defaultData.hero, ...(saved.hero || {}) },
+    navbar: { ...defaultData.navbar, ...(saved.navbar || {}) },
+    profile: { ...defaultData.profile, ...(saved.profile || {}) },
+    loading: { ...defaultData.loading, ...(saved.loading || {}) },
+    contact: { ...defaultData.contact, ...(saved.contact || {}) },
+    _deleted: deleted,
+  }
   if (merged.navbar?.menuItems) {
     merged.navbar.menuItems = merged.navbar.menuItems.filter(
       item => !/kredit/i.test(item.label) && !/kredit/i.test(item.section || '')

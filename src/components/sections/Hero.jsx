@@ -4,17 +4,16 @@ import { Link } from 'react-router-dom'
 import { useData } from '../../context/DataContext'
 import { getWhatsAppLink } from '../../utils/whatsapp'
 
-const heroImages = [
-  'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=1600&q=80',
-  'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=1600&q=80',
-  'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=1600&q=80',
-]
-
 export default function Hero() {
   const { data } = useData()
   const heroData = data.hero
   const profile = data.profile
   const stats = heroData.stats
+  const heroImages = heroData.images?.length ? heroData.images : [
+    'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=1600&q=80',
+    'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=1600&q=80',
+    'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=1600&q=80',
+  ]
   const [currentImage, setCurrentImage] = useState(0)
 
   useEffect(() => {
@@ -22,7 +21,7 @@ export default function Hero() {
       setCurrentImage((prev) => (prev + 1) % heroImages.length)
     }, 5000)
     return () => clearInterval(interval)
-  }, [])
+  }, [heroImages.length])
 
   const fadeUp = {
     hidden: { opacity: 0, y: 40 },
