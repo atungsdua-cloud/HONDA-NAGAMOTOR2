@@ -1,0 +1,6 @@
+framework: vite
+build:
+  command: npm install && npm run build
+  output: dist
+node:
+  version: 20
