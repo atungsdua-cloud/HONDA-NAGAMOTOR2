@@ -18,8 +18,7 @@ export function compressImage(file) {
         canvas.height = height
         const ctx = canvas.getContext('2d')
         ctx.drawImage(img, 0, 0, width, height)
-        const format = file.type === 'image/png' ? 'image/png' : 'image/jpeg'
-        const dataUrl = canvas.toDataURL(format, QUALITY)
+        const dataUrl = canvas.toDataURL('image/png')
         resolve(dataUrl)
       }
       img.onerror = () => reject(new Error('Gagal memuat gambar'))
