@@ -1,5 +1,5 @@
 const MAX_DIMENSION = 1000
-const QUALITY = 0.7
+const QUALITY = 0.8
 
 export function compressImage(file) {
   return new Promise((resolve, reject) => {
@@ -17,10 +17,9 @@ export function compressImage(file) {
         canvas.width = width
         canvas.height = height
         const ctx = canvas.getContext('2d')
-        ctx.fillStyle = '#fff'
-        ctx.fillRect(0, 0, width, height)
         ctx.drawImage(img, 0, 0, width, height)
-        const dataUrl = canvas.toDataURL('image/jpeg', QUALITY)
+        const format = file.type === 'image/png' ? 'image/png' : 'image/jpeg'
+        const dataUrl = canvas.toDataURL(format, QUALITY)
         resolve(dataUrl)
       }
       img.onerror = () => reject(new Error('Gagal memuat gambar'))
