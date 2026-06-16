@@ -171,6 +171,74 @@ function SectionTitle({ children, accent }) {
   )
 }
 
+function FeaturedImage({ images, slideIndex, setSlideIndex, onImageClick }) {
+  if (!images.length) return null
+  useEffect(() => {
+    if (images.length <= 1) return
+    const interval = setInterval(() => {
+      setSlideIndex((prev) => (prev + 1) % images.length)
+    }, 5000)
+    return () => clearInterval(interval)
+  }, [images.length, setSlideIndex])
+
+  return (
+    <section className="bg-gray-100 dark:bg-gray-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="relative rounded-3xl overflow-hidden bg-gray-200 dark:bg-gray-800 cursor-pointer group shadow-xl"
+          onClick={() => onImageClick(slideIndex)}
+        >
+          <img
+            key={images[slideIndex] || 'no-img'}
+            src={images[slideIndex]}
+            alt=""
+            className="w-full h-[50vh] sm:h-[60vh] lg:h-[70vh] object-cover transition-transform duration-700 group-hover:scale-105"
+            onError={(e) => { if (e.target.src !== 'https://placehold.co/1200x800?text=No+Image') e.target.src = 'https://placehold.co/1200x800?text=No+Image' }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+
+          {images.length > 1 && (
+            <>
+              <button onClick={(e) => { e.stopPropagation(); setSlideIndex((prev) => (prev - 1 + images.length) % images.length) }}
+                className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-all opacity-0 group-hover:opacity-100"
+                aria-label="Sebelumnya"><FiChevronLeft size={20} /></button>
+              <button onClick={(e) => { e.stopPropagation(); setSlideIndex((prev) => (prev + 1) % images.length) }}
+                className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-all opacity-0 group-hover:opacity-100"
+                aria-label="Selanjutnya"><FiChevronRight size={20} /></button>
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                {images.map((_, i) => (
+                  <button key={i} onClick={(e) => { e.stopPropagation(); setSlideIndex(i) }}
+                    className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${i === slideIndex ? 'bg-white w-7' : 'bg-white/50 hover:bg-white/80'}`}
+                    aria-label={`Gambar ${i + 1}`} />
+                ))}
+              </div>
+              <div className="absolute top-4 left-4 px-3 py-1.5 bg-black/40 backdrop-blur-sm text-white text-xs font-semibold rounded-full">
+                {slideIndex + 1} / {images.length}
+              </div>
+            </>
+          )}
+        </motion.div>
+
+        {images.length > 1 && (
+          <div className="flex gap-2 mt-4 overflow-x-auto pb-2 scrollbar-hide justify-center">
+            {images.map((img, i) => (
+              <button key={i} onClick={() => setSlideIndex(i)}
+                className={`flex-shrink-0 w-16 h-12 sm:w-20 sm:h-14 rounded-xl overflow-hidden border-2 transition-all ${
+                  i === slideIndex ? 'border-honda-red ring-1 ring-honda-red/30 shadow-lg' : 'border-transparent opacity-50 hover:opacity-100'
+                }`}>
+                <img src={img} alt="" className="w-full h-full object-cover" loading="lazy"
+                  onError={(e) => { if (e.target.src !== 'https://placehold.co/160x112?text=No+Image') e.target.src = 'https://placehold.co/160x112?text=No+Image' }} />
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  )
+}
+
 function ImageGallery({ images, onImageClick, accent }) {
   if (!images.length) return null
   return (
@@ -385,6 +453,9 @@ function renderCustomLayout(product, images, specs, features, colors, keySpecs, 
       <CustomHeroLayout product={product} keySpecs={keySpecs} theme={theme} />
 
       <StickyBar product={product} theme={theme} />
+
+      <FeaturedImage images={images} slideIndex={slideIndex} setSlideIndex={setSlideIndex}
+        onImageClick={(i) => handleLightbox(i)} />
 
       <div className="bg-white dark:bg-gray-900" id="main-content">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
