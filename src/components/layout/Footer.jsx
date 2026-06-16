@@ -29,16 +29,17 @@ export default function Footer() {
             </p>
             <div className="flex gap-3">
               {[
-                { icon: FiInstagram, href: '#' },
-                { icon: FiFacebook, href: '#' },
-                { icon: FiTwitter, href: '#' },
-                { icon: FaTiktok, href: '#' },
-              ].map(({ icon: Icon, href }, i) => (
+                { icon: FiInstagram, href: '#', label: 'Instagram' },
+                { icon: FiFacebook, href: '#', label: 'Facebook' },
+                { icon: FiTwitter, href: '#', label: 'Twitter' },
+                { icon: FaTiktok, href: '#', label: 'TikTok' },
+              ].map(({ icon: Icon, href, label }) => (
                 <motion.a
-                  key={i}
+                  key={label}
                   href={href}
                   whileHover={{ scale: 1.1, y: -2 }}
                   className="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center text-gray-400 hover:bg-honda-red hover:text-white transition-all duration-300"
+                  aria-label={label}
                 >
                   <Icon size={16} />
                 </motion.a>

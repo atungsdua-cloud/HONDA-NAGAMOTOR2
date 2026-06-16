@@ -9,7 +9,7 @@ function AccordionItem({ question, answer, isOpen, onClick }) {
     <div className="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
       <button
         onClick={onClick}
-        className="w-full flex items-center justify-between p-4 sm:p-5 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors text-left"
+        className="w-full flex items-center justify-between p-4 sm:p-5 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-left"
       >
         <span className="font-medium text-sm sm:text-base text-gray-900 dark:text-white pr-4">{question}</span>
         <motion.div
@@ -53,6 +53,11 @@ export default function FAQ() {
           description="Temukan jawaban untuk pertanyaan yang sering diajukan"
         />
 
+        {faqs.length === 0 ? (
+          <div className="text-center py-16 text-gray-400 dark:text-gray-500">
+            <p className="text-sm">Belum ada pertanyaan</p>
+          </div>
+        ) : (
         <div className="max-w-3xl mx-auto space-y-3">
           {faqs.map((faq, i) => (
             <motion.div
@@ -71,6 +76,7 @@ export default function FAQ() {
             </motion.div>
           ))}
         </div>
+        )}
       </div>
     </section>
   )

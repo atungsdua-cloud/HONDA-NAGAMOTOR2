@@ -20,6 +20,11 @@ export default function Keunggulan() {
           description="Kami berkomitmen memberikan pelayanan terbaik untuk setiap konsumen"
         />
 
+        {advantages.length === 0 ? (
+          <div className="text-center py-16 text-gray-400 dark:text-gray-500">
+            <p className="text-sm">Belum ada keunggulan</p>
+          </div>
+        ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {advantages.map((item, i) => {
             const Icon = iconMap[item.icon] || BsLightningCharge
@@ -42,6 +47,7 @@ export default function Keunggulan() {
             )
           })}
         </div>
+        )}
       </div>
     </section>
   )

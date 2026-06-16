@@ -14,6 +14,11 @@ export default function Galeri() {
           description="Dokumentasi konsumen yang telah menerima mobil Honda impian mereka"
         />
 
+        {gallery.length === 0 ? (
+          <div className="text-center py-16 text-gray-400 dark:text-gray-500">
+            <p className="text-sm">Belum ada galeri</p>
+          </div>
+        ) : (
         <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">
           {gallery.map((item, i) => (
             <motion.div
@@ -28,6 +33,7 @@ export default function Galeri() {
                 src={item.src}
                 alt={item.alt}
                 loading="lazy"
+                onError={(e) => { if (e.target.src !== 'https://placehold.co/600x800?text=No+Image') e.target.src = 'https://placehold.co/600x800?text=No+Image' }}
                 className="w-full h-auto object-cover group-hover:scale-110 transition-transform duration-700"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
@@ -36,6 +42,7 @@ export default function Galeri() {
             </motion.div>
           ))}
         </div>
+        )}
       </div>
     </section>
   )

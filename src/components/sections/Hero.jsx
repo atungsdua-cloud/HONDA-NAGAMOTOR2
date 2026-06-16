@@ -32,7 +32,7 @@ export default function Hero() {
   }
 
   return (
-    <section className="relative min-h-[600px] sm:min-h-[700px] flex items-center overflow-hidden">
+    <section className="relative min-h-[600px] sm:min-h-[700px] flex items-center overflow-hidden bg-gray-900">
       {heroImages.map((img, i) => (
         <div
           key={i}

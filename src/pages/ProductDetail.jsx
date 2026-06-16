@@ -386,7 +386,7 @@ function renderCustomLayout(product, images, specs, features, colors, keySpecs, 
 
       <StickyBar product={product} theme={theme} />
 
-      <div className="bg-white dark:bg-gray-900">
+      <div className="bg-white dark:bg-gray-900" id="main-content">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
 
           {showGalleryStrip && (
@@ -440,7 +440,7 @@ function renderCustomLayout(product, images, specs, features, colors, keySpecs, 
                     {colors.map((color, i) => (
                       <div key={i} className="flex flex-col items-center gap-2">
                         <div className="w-12 h-12 rounded-full ring-2 ring-offset-2 ring-offset-white dark:ring-offset-gray-900 transition-transform hover:scale-110 shadow-md"
-                          style={{ backgroundColor: color, ringColor: color === '#FFFFFF' ? '#D1D5DB' : color }} />
+                          style={{ backgroundColor: color, '--tw-ring-color': color === '#FFFFFF' ? '#D1D5DB' : color }} />
                       </div>
                     ))}
                   </div>
@@ -534,7 +534,7 @@ function renderStandardLayout(product, images, specs, features, colors, keySpecs
                       className={`flex-shrink-0 w-[72px] h-[56px] rounded-xl overflow-hidden border-2 transition-all ${
                         i === slideIndex ? 'border-honda-red ring-1 ring-honda-red/30' : 'border-transparent opacity-50 hover:opacity-100'
                       }`}>
-                      <img src={img} alt="" className="w-full h-full object-cover" loading="lazy" onError={(e) => { e.target.style.display = 'none' }} />
+                      <img src={img} alt="" className="w-full h-full object-cover" loading="lazy" onError={(e) => { if (e.target.src !== 'https://placehold.co/144x112?text=No+Image') e.target.src = 'https://placehold.co/144x112?text=No+Image' }} />
                     </button>
                   ))}
                 </div>
@@ -621,7 +621,7 @@ function renderStandardLayout(product, images, specs, features, colors, keySpecs
                     {colors.map((color, i) => (
                       <div key={i} className="flex flex-col items-center gap-1.5">
                         <div className="w-10 h-10 rounded-full ring-2 ring-offset-2 ring-offset-white dark:ring-offset-gray-900 transition-transform hover:scale-110"
-                          style={{ backgroundColor: color, ringColor: color === '#FFFFFF' ? '#D1D5DB' : color }} />
+                          style={{ backgroundColor: color, '--tw-ring-color': color === '#FFFFFF' ? '#D1D5DB' : color }} />
                       </div>
                     ))}
                   </div>
