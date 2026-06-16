@@ -3,8 +3,9 @@ import { useParams, Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import {
   FiArrowLeft, FiCheck, FiChevronLeft, FiChevronRight,
-  FiCpu, FiZap, FiActivity, FiRepeat, FiMaximize2,
-  FiSmartphone, FiShield, FiStar, FiX, FiHeadphones,
+  FiCpu, FiZap, FiActivity, FiRepeat,
+  FiStar, FiX, FiHeadphones,
+  FiMapPin, FiClock, FiTool, FiShieldOff,
 } from 'react-icons/fi'
 import { useData } from '../context/DataContext'
 import { getProductWhatsApp } from '../utils/whatsapp'
@@ -118,6 +119,297 @@ export default function ProductDetail() {
 
   const keySpecs = keySpecKeys.map((k) => ({ key: k, label: formatSpecLabel(k), value: specs[k], Icon: specIcons[k] })).filter((s) => s.value)
   const detailSpecs = Object.entries(specs).filter(([k]) => !keySpecKeys.includes(k))
+
+  if (id === 'brio') {
+    const accent = '#A8D84A'
+    return (
+      <PageTransition>
+        <ProductJsonLd product={product} />
+
+        {/* Floating back button */}
+        <Link to="/" className="fixed top-4 left-4 z-50 w-10 h-10 rounded-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-md shadow-lg flex items-center justify-center hover:scale-105 transition-transform">
+          <FiArrowLeft size={16} className="text-gray-700 dark:text-gray-300" />
+        </Link>
+
+        {/* Hero Section — full bleed */}
+        <section className="relative min-h-[80vh] flex items-end bg-gradient-to-b from-gray-900 via-gray-800 to-black overflow-hidden">
+          <div className="absolute inset-0">
+            <img src={images[slideIndex] || images[0]} alt={product.name}
+              className="w-full h-full object-cover opacity-60"
+              onError={(e) => { if (e.target.src !== 'https://placehold.co/1200x800?text=Brio') e.target.src = 'https://placehold.co/1200x800?text=Brio' }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
+          </div>
+
+          <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-24">
+            <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-xs font-semibold mb-4">
+                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: accent }} />
+                {product.type} — LCGC
+              </div>
+              <h1 className="font-poppins font-black text-4xl sm:text-5xl lg:text-7xl text-white leading-[1.1]">
+                {product.name.split(' ').map((word, i) => (
+                  <span key={i} className={i > 1 ? 'block text-2xl sm:text-3xl lg:text-4xl mt-2 font-semibold text-white/70' : ''}>
+                    {word === 'Satya' || word === 'RS' ? (
+                      <span className="inline-block px-3 py-1 ml-2 rounded-lg text-lg sm:text-xl align-middle"
+                        style={{ backgroundColor: accent, color: '#000' }}>{word}</span>
+                    ) : word}
+                  </span>
+                ))}
+              </h1>
+              <p className="text-lg sm:text-xl text-gray-300 mt-4 max-w-xl">{product.tagline}</p>
+
+              {/* Pull-up specs */}
+              <div className="flex flex-wrap gap-4 sm:gap-8 mt-8">
+                {keySpecs.slice(0, 3).map(({ label, value, Icon }) => (
+                  <div key={label} className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center">
+                      <Icon size={16} className="text-white" />
+                    </div>
+                    <div>
+                      <div className="text-[10px] uppercase tracking-wider text-gray-400">{label}</div>
+                      <div className="text-sm font-semibold text-white">{value}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Pricing strip */}
+        <div className="sticky top-0 z-40 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <span className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 font-semibold">Mulai dari</span>
+              <span className="text-xl sm:text-2xl font-poppins font-bold" style={{ color: accent }}>
+                {product.variants?.[0]?.price || product.price}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <a href={getProductWhatsApp(product.name)} target="_blank" rel="noopener noreferrer"
+                className="px-4 py-2 rounded-xl text-white text-xs font-semibold flex items-center gap-1.5 hover:opacity-90 transition-opacity"
+                style={{ backgroundColor: accent, color: '#000' }}>
+                <FiHeadphones size={14} />
+                Minta Penawaran
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-gray-900">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+
+            {/* Gallery strip */}
+            {images.length > 1 && (
+              <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory -mx-4 sm:mx-0 px-4 sm:px-0 mb-12">
+                {images.map((img, i) => (
+                  <button key={i} onClick={() => setSlideIndex(i)}
+                    className={`snap-start flex-shrink-0 w-[280px] h-[180px] sm:w-[360px] sm:h-[220px] rounded-2xl overflow-hidden border-2 transition-all ${
+                      i === slideIndex ? 'border-white dark:border-white shadow-xl' : 'border-transparent opacity-60 hover:opacity-100'
+                    }`}>
+                    <img src={img} alt="" className="w-full h-full object-cover" loading="lazy" />
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <div className="grid lg:grid-cols-5 gap-10 lg:gap-16">
+              {/* Main content — 3 cols */}
+              <div className="lg:col-span-3 space-y-10">
+
+                {/* Description */}
+                <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+                  <h2 className="font-poppins font-bold text-2xl text-gray-900 dark:text-white mb-4">Tentang {product.name}</h2>
+                  <p className="text-gray-600 dark:text-gray-300 leading-relaxed">{product.description}</p>
+                </motion.div>
+
+                {/* Variants */}
+                {(product.variants || []).length > 0 && (
+                  <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+                    <h2 className="font-poppins font-bold text-2xl text-gray-900 dark:text-white mb-4">Pilih Varian</h2>
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      {product.variants.map((v, vi) => (
+                        <div key={vi} className="relative p-6 rounded-2xl border-2 border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500 transition-all group">
+                          <div className="absolute top-3 right-3 px-2 py-1 rounded-md text-[10px] font-bold uppercase"
+                            style={{ backgroundColor: accent, color: '#000' }}>
+                            {vi === 0 ? 'Ekonomis' : 'Sporty'}
+                          </div>
+                          <h3 className="font-poppins font-bold text-lg text-gray-900 dark:text-white">{v.name}</h3>
+                          <div className="mt-2">
+                            <span className="text-2xl font-poppins font-bold" style={{ color: accent }}>{v.price}</span>
+                          </div>
+                          <div className="mt-4 space-y-1.5 text-sm text-gray-500 dark:text-gray-400">
+                            <div className="flex items-center gap-2"><FiCpu size={14} /> {product.engine}</div>
+                            <div className="flex items-center gap-2"><FiZap size={14} /> {product.fuel}</div>
+                          </div>
+                          <a href={getProductWhatsApp(`${product.name} ${v.name}`)} target="_blank" rel="noopener noreferrer"
+                            className="mt-4 w-full py-2.5 rounded-xl text-sm font-semibold text-center block transition-all hover:opacity-90"
+                            style={{ backgroundColor: accent, color: '#000' }}>
+                            Tanya Varian Ini
+                          </a>
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* Specs */}
+                <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+                  <h2 className="font-poppins font-bold text-2xl text-gray-900 dark:text-white mb-4">Spesifikasi</h2>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {Object.entries(specs).map(([key, val]) => (
+                      <div key={key} className="p-4 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700/40">
+                        <div className="text-[10px] uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">{formatSpecLabel(key)}</div>
+                        <div className="text-sm font-semibold text-gray-900 dark:text-white leading-snug">{val}</div>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+
+                {/* Features */}
+                {features.length > 0 && (
+                  <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+                    <h2 className="font-poppins font-bold text-2xl text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                      <FiStar className="text-yellow-500" size={20} />
+                      Fitur Unggulan
+                    </h2>
+                    <div className="grid sm:grid-cols-2 gap-2.5">
+                      {features.map((f, i) => (
+                        <div key={i} className="flex items-start gap-3 p-3.5 rounded-xl bg-gray-50 dark:bg-gray-800/60 border border-gray-100 dark:border-gray-700/40">
+                          <div className="w-6 h-6 mt-0.5 rounded-full flex items-center justify-center flex-shrink-0"
+                            style={{ backgroundColor: `${accent}20` }}>
+                            <FiCheck size={12} style={{ color: accent }} />
+                          </div>
+                          <span className="text-sm text-gray-700 dark:text-gray-300 leading-snug">{f}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* Colors */}
+                {colors.length > 0 && (
+                  <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+                    <h2 className="font-poppins font-bold text-2xl text-gray-900 dark:text-white mb-4">Pilihan Warna</h2>
+                    <div className="flex flex-wrap gap-4">
+                      {colors.map((color, i) => (
+                        <div key={i} className="flex flex-col items-center gap-2">
+                          <div className="w-12 h-12 rounded-full ring-2 ring-offset-2 ring-offset-white dark:ring-offset-gray-900 transition-transform hover:scale-110 shadow-md"
+                            style={{ backgroundColor: color, ringColor: color === '#FFFFFF' ? '#D1D5DB' : color }}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* Why Brio */}
+                <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+                  className="p-6 sm:p-8 rounded-2xl border-2 border-dashed"
+                  style={{ borderColor: `${accent}40`, backgroundColor: `${accent}08` }}>
+                  <h2 className="font-poppins font-bold text-xl text-gray-900 dark:text-white mb-4">Kenapa Pilih Brio?</h2>
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    {[
+                      { icon: FiMapPin, label: 'Mobil Kota', desc: 'Lincah di jalan perkotaan, parkir mudah' },
+                      { icon: FiClock, label: 'Irit BBM', desc: '~20 km/l — hemat untuk harian' },
+                      { icon: FiShieldOff, label: 'LCGC', desc: 'Pajak murah, perawatan terjangkau' },
+                      { icon: FiTool, label: 'Perawatan Mudah', desc: 'Suku cadang melimpah & murah' },
+                    ].map(({ icon: Icon, label, desc }, i) => (
+                      <div key={i} className="flex items-start gap-3">
+                        <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: `${accent}20` }}>
+                          <Icon size={16} style={{ color: accent }} />
+                        </div>
+                        <div>
+                          <div className="text-sm font-semibold text-gray-900 dark:text-white">{label}</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">{desc}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              </div>
+
+              {/* Sidebar — 2 cols */}
+              <div className="lg:col-span-2 space-y-6 lg:sticky lg:top-24 lg:self-start">
+                {/* Quick summary card */}
+                <div className="p-6 rounded-2xl border-2 border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/60">
+                  <h3 className="font-poppins font-bold text-lg text-gray-900 dark:text-white mb-4">Ringkasan</h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500 dark:text-gray-400">Mulai dari</span>
+                      <span className="font-bold" style={{ color: accent }}>{product.variants?.[0]?.price || product.price}</span>
+                    </div>
+                    {product.variants?.[1] && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-500 dark:text-gray-400">Varian tertinggi</span>
+                        <span className="font-bold text-gray-900 dark:text-white">{product.variants[1].price}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500 dark:text-gray-400">Tipe</span>
+                      <span className="font-medium text-gray-900 dark:text-white">{product.type}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500 dark:text-gray-400">Mesin</span>
+                      <span className="font-medium text-gray-900 dark:text-white">{product.engine}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500 dark:text-gray-400">Konsumsi</span>
+                      <span className="font-medium text-gray-900 dark:text-white">{product.fuel}</span>
+                    </div>
+                  </div>
+
+                  <div className="mt-5 pt-4 border-t border-gray-200 dark:border-gray-700 space-y-2.5">
+                    <p className="text-xs text-gray-400">Cicilan mulai Rp {(parseInt(String(product.variants?.[0]?.price || product.price || '0').replace(/\D/g, '')) / 60 / 1000000).toFixed(1)} Juta/bln*</p>
+                    <a href={getProductWhatsApp(product.name)} target="_blank" rel="noopener noreferrer"
+                      className="block w-full py-3 rounded-xl text-sm font-bold text-center transition-all hover:opacity-90"
+                      style={{ backgroundColor: accent, color: '#000' }}>
+                      <span className="flex items-center justify-center gap-2">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                        Konsultasi via WhatsApp
+                      </span>
+                    </a>
+                    <Link to="/#kontak"
+                      className="block w-full py-3 rounded-xl text-sm font-semibold text-center bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 transition-all">
+                      Jadwal Test Drive
+                    </Link>
+                  </div>
+                </div>
+
+                {/* Promo tag */}
+                <div className="p-5 rounded-2xl text-center" style={{ background: `linear-gradient(135deg, ${accent}, ${accent}88)`, color: '#000' }}>
+                  <div className="text-xs uppercase tracking-widest font-semibold opacity-70">DP Ringan</div>
+                  <div className="text-2xl font-poppins font-black mt-1">Mulai 0%</div>
+                  <div className="text-sm mt-1 opacity-80">Syarat mudah, proses cepat</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Sticky bottom CTA mobile */}
+        <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-t border-gray-200 dark:border-gray-700 px-4 py-3 safe-area-bottom">
+          <div className="flex gap-3 max-w-lg mx-auto">
+            <a href={getProductWhatsApp(product.name)} target="_blank" rel="noopener noreferrer"
+              className="flex-1 px-4 py-3 rounded-xl font-semibold text-xs flex items-center justify-center gap-2 shadow-lg"
+              style={{ backgroundColor: accent, color: '#000' }}>
+              <FiHeadphones size={14} />
+              Minta Penawaran
+            </a>
+            <Link to="/#kontak"
+              className="flex-1 px-4 py-3 bg-honda-red text-white rounded-xl font-semibold text-xs flex items-center justify-center gap-2">
+              Test Drive
+            </Link>
+          </div>
+        </div>
+
+        {lightboxIndex !== null && (
+          <ImageLightbox images={images} index={lightboxIndex} onClose={handleLightbox} />
+        )}
+      </PageTransition>
+    )
+  }
 
   return (
     <PageTransition>
