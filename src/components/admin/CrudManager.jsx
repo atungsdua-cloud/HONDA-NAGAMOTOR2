@@ -19,6 +19,9 @@ const fieldTypes = {
   gradient: { render: (value) => value ? <span className="text-xs font-mono text-gray-500 truncate">{value}</span> : <span className="text-gray-400">-</span> },
   list: { render: (value) => <span className="text-xs text-gray-500">{value?.length || 0} item</span> },
   kv: { render: (value) => <span className="text-xs text-gray-500">{value ? Object.keys(value).length : 0} item</span> },
+  variants: { render: (value) => value?.length > 0
+    ? <span className="text-xs text-gray-500">{value.map(v => v.name).join(', ')}</span>
+    : <span className="text-gray-400">-</span> },
 }
 
 const gradientPresets = [
@@ -133,6 +136,24 @@ function FieldInput({ field, value, onChange, autoFocus }) {
           </div>
         ))}
         <button onClick={addItem} className="text-[11px] text-honda-red hover:underline flex items-center gap-1"><FiPlus size={12} /> Tambah</button>
+      </div>
+    )
+  }
+  if (field.type === 'variants') {
+    const items = Array.isArray(value) ? value : []
+    const addItem = () => onChange([...items, { name: '', price: '' }])
+    return (
+      <div className="space-y-1.5">
+        {items.map((item, i) => (
+          <div key={i} className="flex gap-1.5">
+            <input type="text" value={item.name} onChange={e => { const n = [...items]; n[i] = { ...n[i], name: e.target.value }; onChange(n) }}
+              placeholder="Nama Tipe" className={`${inputClass} w-2/5 text-sm py-1.5`} />
+            <input type="text" value={item.price} onChange={e => { const n = [...items]; n[i] = { ...n[i], price: e.target.value }; onChange(n) }}
+              placeholder="Harga" className={`${inputClass} flex-1 text-sm py-1.5`} />
+            <button onClick={() => onChange(items.filter((_, idx) => idx !== i))} className="text-red-400 hover:text-red-600 px-1"><FiX size={15} /></button>
+          </div>
+        ))}
+        <button onClick={addItem} className="text-[11px] text-honda-red hover:underline flex items-center gap-1"><FiPlus size={12} /> Tambah Varian</button>
       </div>
     )
   }
@@ -292,6 +313,7 @@ export default function CrudManager({ config }) {
       if (f.type === 'list' || f.type === 'images') defaults[f.key] = []
       else if (f.type === 'colors') defaults[f.key] = []
       else if (f.type === 'kv') defaults[f.key] = {}
+      else if (f.type === 'variants') defaults[f.key] = []
       else defaults[f.key] = ''
     })
     defaults.id = `${config.type}-${Date.now()}${Math.random().toString(36).substr(2, 4)}`

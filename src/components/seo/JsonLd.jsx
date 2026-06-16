@@ -1,8 +1,9 @@
 import { useData } from '../../context/DataContext'
 
 export function ProductJsonLd({ product }) {
-  if (!product || !product.price) return null
-  const price = String(product.price).replace(/[^\d]/g, '')
+  const priceStr = product.variants?.[0]?.price || product.price
+  if (!product || !priceStr) return null
+  const price = String(priceStr).replace(/[^\d]/g, '')
   const json = {
     '@context': 'https://schema.org',
     '@type': 'Product',

@@ -25,8 +25,8 @@ const produkConfig = {
   fields: [
     { key: 'name', label: 'Nama Mobil', type: 'text', placeholder: 'cth: Honda Civic RS 2025' },
     { key: 'tagline', label: 'Tagline', type: 'text', placeholder: 'cth: Lebih dari sekadar mobil' },
-    { key: 'price', label: 'Harga', type: 'text', placeholder: 'cth: Rp 400.000.000' },
-    { key: 'type', label: 'Tipe', type: 'text', placeholder: 'cth: Sedan / Hatchback / SUV' },
+    { key: 'variants', label: 'Varian Harga', type: 'variants' },
+    { key: 'type', label: 'Kategori', type: 'text', placeholder: 'cth: Hatchback / SUV / Sedan' },
     { key: 'engine', label: 'Mesin', type: 'text', placeholder: 'cth: 1.5L VTEC Turbo' },
     { key: 'fuel', label: 'Konsumsi BBM', type: 'text', placeholder: 'cth: 18 km/l' },
     { key: 'image', label: 'Foto Utama (thumbnail card)', type: 'image' },
