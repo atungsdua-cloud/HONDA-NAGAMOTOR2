@@ -171,16 +171,41 @@ function SectionTitle({ children, accent }) {
   )
 }
 
-function HeroLayout({ product, images, theme, slideIndex, setSlideIndex, keySpecs, children }) {
+function ImageGallery({ images, onImageClick, accent }) {
+  if (images.length <= 1) return null
+  return (
+    <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+      <SectionTitle accent={accent}>Galeri Foto</SectionTitle>
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {images.map((img, i) => (
+          <button key={i} onClick={() => onImageClick(i)}
+            className="relative rounded-2xl overflow-hidden aspect-[4/3] group cursor-pointer bg-gray-100 dark:bg-gray-700">
+            <img src={img} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              loading="lazy"
+              onError={(e) => { if (e.target.src !== 'https://placehold.co/600x450?text=Foto') e.target.src = 'https://placehold.co/600x450?text=Foto' }} />
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
+            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <div className="w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center">
+                <FiChevronRight size={18} className="text-gray-900" />
+              </div>
+            </div>
+          </button>
+        ))}
+      </div>
+    </motion.div>
+  )
+}
+
+function HeroLayout({ product, images, theme, slideIndex, setSlideIndex, keySpecs, onHeroClick, children }) {
   return (
     <section className={`relative ${theme.heroSize} flex items-end bg-gradient-to-b ${theme.heroGrad} overflow-hidden`}>
-      <div className="absolute inset-0">
+      <button className="absolute inset-0 w-full text-left" onClick={() => onHeroClick?.(slideIndex)} aria-label="Buka galeri">
         <img src={images[slideIndex] || images[0]} alt={product.name}
           className="w-full h-full object-cover opacity-60"
           onError={(e) => { if (e.target.src !== 'https://placehold.co/1200x800?text=' + product.name) e.target.src = 'https://placehold.co/1200x800?text=' + product.name }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
-      </div>
+      </button>
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-24">
         <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-xs font-semibold mb-4">
@@ -329,22 +354,6 @@ function WhySection({ theme }) {
   )
 }
 
-function GalleryStrip({ images, slideIndex, setSlideIndex }) {
-  if (images.length <= 1) return null
-  return (
-    <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory -mx-4 sm:mx-0 px-4 sm:px-0 mb-12">
-      {images.map((img, i) => (
-        <button key={i} onClick={() => setSlideIndex(i)}
-          className={`snap-start flex-shrink-0 w-[280px] h-[180px] sm:w-[360px] sm:h-[220px] rounded-2xl overflow-hidden border-2 transition-all ${
-            i === slideIndex ? 'border-white dark:border-white shadow-xl' : 'border-transparent opacity-60 hover:opacity-100'
-          }`}>
-          <img src={img} alt="" className="w-full h-full object-cover" loading="lazy" />
-        </button>
-      ))}
-    </div>
-  )
-}
-
 function StickyBottomCTA({ product, theme }) {
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-t border-gray-200 dark:border-gray-700 px-4 py-3 safe-area-bottom">
@@ -364,15 +373,15 @@ function StickyBottomCTA({ product, theme }) {
   )
 }
 
-function CustomHeroLayout({ product, images, slideIndex, setSlideIndex, keySpecs, theme }) {
+function CustomHeroLayout({ product, images, slideIndex, setSlideIndex, keySpecs, theme, onHeroClick }) {
   return (
     <HeroLayout product={product} images={images} theme={theme}
-      slideIndex={slideIndex} setSlideIndex={setSlideIndex} keySpecs={keySpecs} />
+      slideIndex={slideIndex} setSlideIndex={setSlideIndex} keySpecs={keySpecs}
+      onHeroClick={onHeroClick} />
   )
 }
 
 function renderCustomLayout(product, images, specs, features, colors, keySpecs, detailSpecs, slideIndex, setSlideIndex, lightboxIndex, handleLightbox, related, theme) {
-  const showGalleryStrip = theme.vibe !== 'tech' && theme.vibe !== 'executive'
 
   return (
     <PageTransition>
@@ -382,16 +391,15 @@ function renderCustomLayout(product, images, specs, features, colors, keySpecs, 
       </Link>
 
       <CustomHeroLayout product={product} images={images} theme={theme}
-        slideIndex={slideIndex} setSlideIndex={setSlideIndex} keySpecs={keySpecs} />
+        slideIndex={slideIndex} setSlideIndex={setSlideIndex} keySpecs={keySpecs}
+        onHeroClick={(i) => handleLightbox(i)} />
 
       <StickyBar product={product} theme={theme} />
 
       <div className="bg-white dark:bg-gray-900" id="main-content">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
 
-          {showGalleryStrip && (
-            <GalleryStrip images={images} slideIndex={slideIndex} setSlideIndex={setSlideIndex} />
-          )}
+          <ImageGallery images={images} onImageClick={(i) => handleLightbox(i)} accent={theme.accent} />
 
           <div className="grid lg:grid-cols-5 gap-10 lg:gap-16">
             <div className="lg:col-span-3 space-y-10">
