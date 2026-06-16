@@ -172,7 +172,7 @@ function SectionTitle({ children, accent }) {
 }
 
 function ImageGallery({ images, onImageClick, accent }) {
-  if (images.length <= 1) return null
+  if (!images.length) return null
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
       <SectionTitle accent={accent}>Galeri Foto</SectionTitle>
@@ -196,16 +196,10 @@ function ImageGallery({ images, onImageClick, accent }) {
   )
 }
 
-function HeroLayout({ product, images, theme, slideIndex, setSlideIndex, keySpecs, onHeroClick, children }) {
+function HeroLayout({ product, keySpecs, theme }) {
   return (
     <section className={`relative ${theme.heroSize} flex items-end bg-gradient-to-b ${theme.heroGrad} overflow-hidden`}>
-      <button className="absolute inset-0 w-full text-left" onClick={() => onHeroClick?.(slideIndex)} aria-label="Buka galeri">
-        <img src={images[slideIndex] || images[0]} alt={product.name}
-          className="w-full h-full object-cover opacity-60"
-          onError={(e) => { if (e.target.src !== 'https://placehold.co/1200x800?text=' + product.name) e.target.src = 'https://placehold.co/1200x800?text=' + product.name }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
-      </button>
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-24">
         <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-xs font-semibold mb-4">
@@ -373,11 +367,9 @@ function StickyBottomCTA({ product, theme }) {
   )
 }
 
-function CustomHeroLayout({ product, images, slideIndex, setSlideIndex, keySpecs, theme, onHeroClick }) {
+function CustomHeroLayout({ product, keySpecs, theme }) {
   return (
-    <HeroLayout product={product} images={images} theme={theme}
-      slideIndex={slideIndex} setSlideIndex={setSlideIndex} keySpecs={keySpecs}
-      onHeroClick={onHeroClick} />
+    <HeroLayout product={product} keySpecs={keySpecs} theme={theme} />
   )
 }
 
@@ -390,9 +382,7 @@ function renderCustomLayout(product, images, specs, features, colors, keySpecs, 
         <FiArrowLeft size={16} className="text-gray-700 dark:text-gray-300" />
       </Link>
 
-      <CustomHeroLayout product={product} images={images} theme={theme}
-        slideIndex={slideIndex} setSlideIndex={setSlideIndex} keySpecs={keySpecs}
-        onHeroClick={(i) => handleLightbox(i)} />
+      <CustomHeroLayout product={product} keySpecs={keySpecs} theme={theme} />
 
       <StickyBar product={product} theme={theme} />
 
