@@ -69,7 +69,7 @@ export default function Products() {
               viewport={{ once: true, margin: '-50px' }}
               className="group relative bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700/50 shadow-sm hover:shadow-xl hover:border-honda-red/30 transition-all duration-500"
             >
-              <div className="relative h-52 sm:h-48 overflow-hidden bg-gray-100 dark:bg-gray-700 aspect-[4/3]">
+              <div className="relative h-52 sm:h-48 overflow-hidden bg-gray-100 dark:bg-gray-700">
                 <img
                   key={product.image || product.images?.[0] || 'no-img'}
                   src={product.image || product.images?.[0]}

@@ -139,12 +139,12 @@ function SpecBadge({ label, value, Icon, accent }) {
   )
 }
 
-function VariantCard({ variant, index, engine, fuel, accent, productName }) {
+function VariantCard({ variant, index, engine, fuel, accent, productName, variantsCount }) {
   return (
     <div className="relative p-6 rounded-2xl border-2 border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500 transition-all group">
       <div className="absolute top-3 right-3 px-2 py-1 rounded-md text-[10px] font-bold uppercase"
         style={{ backgroundColor: accent, color: '#000' }}>
-        {index === 0 && index === variant.length - 1 ? '' : index === 0 ? 'Entry' : index === 1 ? 'Tertinggi' : 'Varian'}
+        {variantsCount === 1 ? '' : index === 0 ? 'Entry' : index === 1 ? 'Tertinggi' : 'Varian'}
       </div>
       <h3 className="font-poppins font-bold text-lg text-gray-900 dark:text-white">{variant.name}</h3>
       <div className="mt-2">
@@ -405,8 +405,8 @@ function renderCustomLayout(product, images, specs, features, colors, keySpecs, 
                   <SectionTitle accent={theme.accent}>Pilih Varian</SectionTitle>
                   <div className="grid sm:grid-cols-2 gap-4">
                     {product.variants.map((v, vi) => (
-                      <VariantCard key={vi} variant={v} index={vi} engine={product.engine}
-                        fuel={product.fuel} accent={theme.accent} productName={product.name} />
+                      <VariantCard key={vi} variant={v} index={vi} variantsCount={product.variants.length}
+                        engine={product.engine} fuel={product.fuel} accent={theme.accent} productName={product.name} />
                     ))}
                   </div>
                 </motion.div>

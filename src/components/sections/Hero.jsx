@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
+import { useEffect, useState, useRef } from 'react'
+import { motion, useInView } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { useData } from '../../context/DataContext'
 import { getWhatsAppLink } from '../../utils/whatsapp'
@@ -188,7 +188,12 @@ export default function Hero() {
 
 function AnimatedCounter({ value, suffix }) {
   const [count, setCount] = useState(0)
+  const [started, setStarted] = useState(false)
+  const ref = useRef(null)
+  const inView = useInView(ref, { once: true, margin: '-50px' })
   useEffect(() => {
+    if (!inView || started) return
+    setStarted(true)
     const duration = 2000
     const steps = 60
     const increment = value / steps
@@ -203,6 +208,6 @@ function AnimatedCounter({ value, suffix }) {
       }
     }, duration / steps)
     return () => clearInterval(timer)
-  }, [value])
-  return <>{count}{suffix}</>
+  }, [inView, value, started])
+  return <span ref={ref}>{count}{suffix}</span>
 }
