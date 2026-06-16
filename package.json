@@ -5,11 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:server": "concurrently -n \"vite,express\" -c \"cyan,green\" \"vite\" \"node server.js\"",
     "build": "vite build",
+    "postinstall": "npm run build",
     "start": "node server.js",
     "preview": "vite preview"
   },
   "dependencies": {
+    "better-sqlite3": "^12.11.1",
     "express": "^5.2.1",
     "framer-motion": "^12.10.5",
     "react": "^19.1.0",
@@ -23,6 +26,7 @@
     "@tailwindcss/vite": "^4.3.1",
     "@vitejs/plugin-react": "^4.4.1",
     "autoprefixer": "^10.4.21",
+    "concurrently": "^10.0.3",
     "postcss": "^8.5.3",
     "tailwindcss": "^4.3.1",
     "vite": "^6.3.3"
