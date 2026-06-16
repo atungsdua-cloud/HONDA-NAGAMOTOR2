@@ -38,7 +38,7 @@ export default function Hero() {
           key={i}
           className={`absolute inset-0 transition-opacity duration-1000 ${i === currentImage ? 'opacity-100' : 'opacity-0'}`}
         >
-          <img src={img} alt={`Honda ${i + 1}`} className="w-full h-full object-cover" />
+          <img src={img} alt={`Honda ${i + 1}`} className="w-full h-full object-cover" onError={e => { e.target.style.display = 'none' }} />
           <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-black/30" />
         </div>
       ))}
