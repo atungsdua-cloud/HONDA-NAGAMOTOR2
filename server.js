@@ -61,15 +61,17 @@ app.get('/{*path}', (_req, res) => {
 })
 
 async function start() {
-  await mongoose.connect(MONGODB_URI)
-  console.log('Terhubung ke MongoDB Atlas')
+  try {
+    await mongoose.connect(MONGODB_URI)
+    console.log('Terhubung ke MongoDB Atlas')
+  } catch (err) {
+    console.error('Gagal terhubung ke MongoDB:', err.message)
+    console.log('Server tetap berjalan tanpa database')
+  }
 
   app.listen(PORT, () => {
     console.log(`Server berjalan di port ${PORT}`)
   })
 }
 
-start().catch((err) => {
-  console.error('Gagal start server:', err)
-  process.exit(1)
-})
+start()
