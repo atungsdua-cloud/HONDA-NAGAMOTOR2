@@ -18,7 +18,7 @@ const filterCategories = ['Semua', 'Hatchback', 'Mini SUV', 'SUV 7-Seater', 'Cro
 
 export default function Products() {
   const { data } = useData()
-  const products = data.products
+  const products = data.products || []
   const [activeFilter, setActiveFilter] = useState('Semua')
 
   const filtered = activeFilter === 'Semua'

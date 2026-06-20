@@ -117,18 +117,19 @@ function StatsBuilder({ items, onChange }) {
 
 function AdminDashboard() {
   const { data, resetAll } = useData()
-  const totalItems = data.products.length + data.promotions.length + data.testimonials.length + data.gallery.length + data.faqs.length + data.advantages.length
+  const { products = [], promotions = [], testimonials = [], gallery = [], faqs = [], advantages = [] } = data
+  const totalItems = products.length + promotions.length + testimonials.length + gallery.length + faqs.length + advantages.length
 
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
         {[
-          { label: 'Produk', count: data.products.length, color: 'bg-blue-500' },
-          { label: 'Promo', count: data.promotions.length, color: 'bg-red-500' },
-          { label: 'Testimoni', count: data.testimonials.length, color: 'bg-yellow-500' },
-          { label: 'Galeri', count: data.gallery.length, color: 'bg-purple-500' },
-          { label: 'FAQ', count: data.faqs.length, color: 'bg-green-500' },
-          { label: 'Keunggulan', count: data.advantages.length, color: 'bg-indigo-500' },
+          { label: 'Produk', count: products.length, color: 'bg-blue-500' },
+          { label: 'Promo', count: promotions.length, color: 'bg-red-500' },
+          { label: 'Testimoni', count: testimonials.length, color: 'bg-yellow-500' },
+          { label: 'Galeri', count: gallery.length, color: 'bg-purple-500' },
+          { label: 'FAQ', count: faqs.length, color: 'bg-green-500' },
+          { label: 'Keunggulan', count: advantages.length, color: 'bg-indigo-500' },
         ].map((item) => (
           <div key={item.label} className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
             <div className={`w-3 h-3 rounded-full ${item.color} mb-2`} />
@@ -238,7 +239,7 @@ function AdminHero() {
   }
 
   const removeImage = (index) => {
-    setForm(prev => ({ ...prev, images: prev.images.filter((_, i) => i !== index) }))
+    setForm(prev => ({ ...prev, images: (prev.images || []).filter((_, i) => i !== index) }))
   }
 
   const reorderImage = (index, dir) => {
@@ -289,7 +290,7 @@ function AdminHero() {
         <div>
           <label className={labelClass}>Foto Sales (PNG)</label>
           <div className="flex gap-2">
-            <input type="text" value={form.salesPhoto || data.profile.photo} onChange={e => setForm({ ...form, salesPhoto: e.target.value })} className={inputClass} placeholder="URL foto sales (kosongkan untuk pakai foto profil)" />
+            <input type="text" value={form.salesPhoto || data.profile?.photo || ''} onChange={e => setForm({ ...form, salesPhoto: e.target.value })} className={inputClass} placeholder="URL foto sales (kosongkan untuk pakai foto profil)" />
           </div>
           <p className="text-xs text-gray-400 mt-1">Kosongkan untuk menggunakan foto dari Profil Sales</p>
         </div>
@@ -559,9 +560,9 @@ function AdminGaleri() {
 function AdminNavbar() {
   const { data, updateNavbar } = useData()
   const { addToast } = useToast()
-  const [form, setForm] = useState({ ...data.navbar, loading: { ...data.loading } })
+  const [form, setForm] = useState({ menuItems: [], ...data.navbar, loading: { ...data.loading } })
 
-  useEffect(() => { setForm({ ...data.navbar, loading: { ...data.loading } }) }, [data.navbar, data.loading])
+  useEffect(() => { setForm({ menuItems: [], ...data.navbar, loading: { ...data.loading } }) }, [data.navbar, data.loading])
 
   const handleSave = () => {
     const { menuItems, logoImage, logoText, logoSubtext, ctaText, ctaUrl, loading } = form
@@ -697,7 +698,7 @@ function AdminContact() {
   const removeSocial = (i) => {
     setForm(prev => ({
       ...prev,
-      socialMedia: prev.socialMedia.filter((_, idx) => idx !== i),
+      socialMedia: (prev.socialMedia || []).filter((_, idx) => idx !== i),
     }))
   }
 

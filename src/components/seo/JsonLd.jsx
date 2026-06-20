@@ -79,7 +79,7 @@ export default function StructuredData() {
       <LocalBusinessJsonLd />
       <ReviewJsonLd testimonials={data.testimonials} />
       <FaqJsonLd faqs={data.faqs} />
-      {data.products.map(p => (
+      {(data.products || []).map(p => (
         <ProductJsonLd key={p.id} product={p} />
       ))}
     </>

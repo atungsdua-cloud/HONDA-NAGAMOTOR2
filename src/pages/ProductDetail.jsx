@@ -771,7 +771,8 @@ function renderStandardLayout(product, images, specs, features, colors, keySpecs
 export default function ProductDetail() {
   const { id } = useParams()
   const { data } = useData()
-  const product = data.products.find((p) => p.id === id)
+  const products = data.products || []
+  const product = products.find((p) => p.id === id)
   const images = (product?.images?.length ? product.images : [product?.image]).filter(Boolean)
   const specs = product?.specs || {}
   const features = product?.features || []
@@ -779,7 +780,7 @@ export default function ProductDetail() {
   const [slideIndex, setSlideIndex] = useState(0)
   const [lightboxIndex, setLightboxIndex] = useState(null)
 
-  const related = data.products
+  const related = products
     .filter((p) => p.id !== product?.id && p.type === product?.type)
     .slice(0, 3)
 
