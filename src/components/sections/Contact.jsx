@@ -10,7 +10,7 @@ const iconMap = { FaInstagram, FaFacebook, FaTiktok }
 
 export default function Contact() {
   const { data } = useData()
-  const products = data.products
+  const products = data.products || []
   const contact = data.contact || {}
   const [form, setForm] = useState({ name: '', phone: '', product: '', message: '' })
 

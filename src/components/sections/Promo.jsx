@@ -33,7 +33,7 @@ function CountdownTimer({ targetDate }) {
 
 export default function Promo() {
   const { data } = useData()
-  const promotions = data.promotions
+  const promotions = data.promotions || []
   return (
     <section id="promo" className="py-20 lg:py-28 bg-dark text-white relative overflow-hidden">
       <div className="absolute inset-0 bg-grid opacity-10 parallax hidden lg:block" />

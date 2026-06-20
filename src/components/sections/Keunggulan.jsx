@@ -9,7 +9,7 @@ const iconMap = {
 
 export default function Keunggulan() {
   const { data } = useData()
-  const advantages = data.advantages
+  const advantages = data.advantages || []
 
   return (
     <section className="py-20 lg:py-28 bg-light dark:bg-gray-900 transition-colors duration-500">

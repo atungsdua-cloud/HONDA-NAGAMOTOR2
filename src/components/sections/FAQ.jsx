@@ -41,7 +41,7 @@ function AccordionItem({ question, answer, isOpen, onClick }) {
 
 export default function FAQ() {
   const { data } = useData()
-  const faqs = data.faqs
+  const faqs = data.faqs || []
   const [openIndex, setOpenIndex] = useState(null)
 
   return (

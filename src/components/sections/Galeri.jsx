@@ -4,7 +4,7 @@ import SectionTitle from '../ui/SectionTitle'
 
 export default function Galeri() {
   const { data } = useData()
-  const gallery = data.gallery
+  const gallery = data.gallery || []
   return (
     <section className="py-20 lg:py-28 bg-white dark:bg-gray-800 transition-colors duration-500">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

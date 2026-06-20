@@ -6,9 +6,9 @@ import { getWhatsAppLink } from '../../utils/whatsapp'
 
 export default function Hero() {
   const { data } = useData()
-  const heroData = data.hero
-  const profile = data.profile
-  const stats = heroData.stats
+  const heroData = data.hero || {}
+  const profile = data.profile || {}
+  const stats = heroData.stats || []
   const heroImages = heroData.images?.length ? heroData.images : [
     'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=1600&q=80',
     'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=1600&q=80',
@@ -64,7 +64,7 @@ export default function Hero() {
               animate="visible"
               className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-poppins font-extrabold text-white leading-tight mb-6"
             >
-              {heroData.title.split(' ').map((word, i) => (
+              {(heroData.title || 'Selamat Datang di Honda Nagamotor').split(' ').map((word, i) => (
                 <motion.span
                   key={i}
                   initial={{ opacity: 0, y: 20 }}
@@ -90,7 +90,7 @@ export default function Hero() {
               animate="visible"
               className="text-lg sm:text-xl text-gray-300 mb-8 max-w-xl leading-relaxed"
             >
-              {heroData.subtitle}
+              {heroData.subtitle || 'Promo terbaik, DP ringan, proses cepat, dan pelayanan profesional.'}
             </motion.p>
 
             <motion.div
@@ -152,8 +152,8 @@ export default function Hero() {
                 className="relative z-10"
               >
                 <img
-                  src={heroData.salesPhoto || profile.photo}
-                  alt={profile.name}
+                  src={heroData.salesPhoto || profile.photo || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80'}
+                  alt={profile.name || 'Sales'}
                   className="max-w-[250px] sm:max-w-[320px] lg:max-w-[400px] w-full h-auto drop-shadow-xl"
                 />
               </motion.div>

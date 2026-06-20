@@ -8,7 +8,7 @@ const iconMap = { FiAward, FiUsers, FiStar }
 
 export default function TentangSales() {
   const { data } = useData()
-  const profile = data.profile
+  const profile = data.profile || {}
 
   return (
     <section id="tentang" className="py-20 lg:py-28 bg-white dark:bg-gray-800 transition-colors duration-500">
