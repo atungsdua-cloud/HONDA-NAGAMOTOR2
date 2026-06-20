@@ -12,7 +12,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "better-sqlite3": "^12.11.1",
+    "dotenv": "^16.4.7",
+    "mongoose": "^8.14.1",
     "express": "^5.2.1",
     "framer-motion": "^12.10.5",
     "react": "^19.1.0",
