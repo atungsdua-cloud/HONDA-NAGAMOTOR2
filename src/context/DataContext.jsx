@@ -1,117 +1,13 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react'
-import { products as defaultProducts, promotions as defaultPromotions, testimonials as defaultTestimonials, gallery as defaultGallery, faqs as defaultFaqs, advantages as defaultAdvantages } from '../data'
 
 const API_ENDPOINT = '/api/data'
 const STORAGE_KEY = 'honda-cms-data'
 
-const defaultData = {
-  products: defaultProducts,
-  promotions: defaultPromotions,
-  testimonials: defaultTestimonials,
-  gallery: defaultGallery,
-  faqs: defaultFaqs,
-  advantages: defaultAdvantages,
-  profile: {
-    name: 'Ahmad Rizky',
-    title: 'Sales Executive Honda Nagamotor',
-    photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80',
-    experience: '10 Tahun Pengalaman',
-    description: 'Sejak 2015 saya bergabung dengan Honda Nagamotor dan telah membantu ratusan konsumen menemukan mobil Honda impian mereka.',
-    stats: [
-      { icon: 'FiAward', value: '500+', label: 'Unit Terjual' },
-      { icon: 'FiUsers', value: '1000+', label: 'Pelanggan' },
-      { icon: 'FiStar', value: '4.9', label: 'Rating' },
-    ],
-  },
-  hero: {
-    title: 'Temukan Honda Impian Anda Hari Ini Bersama Saya Aldi Nagamotor',
-    subtitle: 'Promo terbaik, DP ringan, proses cepat, dan pelayanan profesional dari sales berpengalaman.',
-    salesPhoto: '',
-    images: [
-      'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=1600&q=80',
-      'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=1600&q=80',
-      'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=1600&q=80',
-    ],
-    stats: [
-      { value: 500, suffix: '+', label: 'Unit Terjual' },
-      { value: 1000, suffix: '+', label: 'Konsumen Puas' },
-      { value: 10, suffix: '+', label: 'Tahun Pengalaman' },
-    ],
-  },
-  navbar: {
-    logoImage: '',
-    logoText: 'HONDA',
-    logoSubtext: 'Nagamotor',
-    ctaText: 'Hubungi Saya',
-    ctaUrl: '',
-    menuItems: [
-      { label: 'Beranda', section: '' },
-      { label: 'Produk', section: 'produk' },
-      { label: 'Promo', section: 'promo' },
-      { label: 'Testimoni', section: 'testimoni' },
-      { label: 'Tentang', section: 'tentang' },
-      { label: 'Kontak', section: 'kontak' },
-    ],
-  },
-  loading: {
-    title: 'HONDA',
-    subtext: 'NAGAMOTOR',
-    tagline: 'Dealer Resmi Honda',
-  },
-  contact: {
-    phone: '+62 812 3456 7890',
-    email: 'sales@hondanagamotor.com',
-    address: 'Jakarta Selatan, Indonesia',
-    mapUrl: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.0!2d106.8!3d-6.2!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zNsKwMTInMDAuMCJTIDEwNsKwNDgnMDAuMCJF!5e0!3m2!1sid!2sid!4v1',
-    socialMedia: [
-      { platform: 'Instagram', url: '#', icon: 'FaInstagram' },
-      { platform: 'Facebook', url: '#', icon: 'FaFacebook' },
-      { platform: 'TikTok', url: '#', icon: 'FaTiktok' },
-    ],
-  },
-}
-
-function mergeArray(defaults, saved, deleted, idKey = 'id') {
-  const savedArr = saved || []
-  const deletedSet = new Set((deleted || []).map(d => d.id))
-  const merged = defaults
-    .filter(d => !deletedSet.has(d[idKey]))
-    .map(d => {
-      const existing = savedArr.find(s => s[idKey] === d[idKey])
-      return existing ? { ...d, ...existing } : d
-    })
-  savedArr.forEach(s => {
-    if (!merged.find(m => m[idKey] === s[idKey])) {
-      merged.push(s)
-    }
-  })
-  return merged
-}
+const defaultData = {}
 
 function mergeData(saved) {
   if (!saved) return defaultData
-  const deleted = saved._deleted || []
-  const merged = {
-    ...defaultData,
-    ...saved,
-    hero: { ...defaultData.hero, ...(saved.hero || {}) },
-    navbar: { ...defaultData.navbar, ...(saved.navbar || {}) },
-    profile: { ...defaultData.profile, ...(saved.profile || {}) },
-    loading: { ...defaultData.loading, ...(saved.loading || {}) },
-    contact: { ...defaultData.contact, ...(saved.contact || {}) },
-    _deleted: deleted,
-  }
-  if (merged.navbar?.menuItems) {
-    merged.navbar.menuItems = merged.navbar.menuItems.filter(
-      item => !/kredit/i.test(item.label) && !/kredit/i.test(item.section || '')
-    )
-  }
-  merged.products = mergeArray(defaultData.products, saved.products, deleted)
-  merged.promotions = mergeArray(defaultData.promotions, saved.promotions, deleted)
-  merged.testimonials = mergeArray(defaultData.testimonials, saved.testimonials, deleted)
-  merged.gallery = mergeArray(defaultData.gallery, saved.gallery, deleted)
-  merged.faqs = mergeArray(defaultData.faqs, saved.faqs, deleted)
-  merged.advantages = mergeArray(defaultData.advantages, saved.advantages, deleted)
+  const merged = { ...saved, _deleted: saved._deleted || [] }
   return merged
 }
 
@@ -208,13 +104,7 @@ export function DataProvider({ children }) {
   const remove = useCallback((type, id) => {
     setData(prev => {
       const items = prev[type] || []
-      const isDefault = defaultData[type]?.some(d => String(d.id) === String(id))
-      const deleted = prev._deleted || []
-      return {
-        ...prev,
-        [type]: items.filter(item => item.id !== id),
-        _deleted: isDefault ? [...deleted.filter(d => !(d.type === type && String(d.id) === String(id))), { type, id }] : deleted,
-      }
+      return { ...prev, [type]: items.filter(item => item.id !== id) }
     })
     setLastUpdate(Date.now())
   }, [])
@@ -222,14 +112,13 @@ export function DataProvider({ children }) {
   const resetType = useCallback((type) => {
     setData(prev => ({
       ...prev,
-      [type]: defaultData[type] || [],
-      _deleted: (prev._deleted || []).filter(d => d.type !== type),
+      [type]: [],
     }))
     setLastUpdate(Date.now())
   }, [])
 
   const resetAll = useCallback(() => {
-    setData({ ...defaultData, _deleted: [] })
+    setData({})
     setLastUpdate(Date.now())
   }, [])
 
