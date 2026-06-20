@@ -1,8 +1,18 @@
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
+
+  # bypass API routes — Hostinger proxy forwards these to Node.js
+  RewriteRule ^api/ - [L]
+
   RewriteRule ^index\.html$ - [L]
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteRule . /index.html [L]
+</IfModule>
+
+# disable ModSecurity for API requests (Hostinger WAF often blocks /api/)
+<IfModule mod_security.c>
+  SecRuleEngine Off
+  SecFilterInheritance Off
 </IfModule>
