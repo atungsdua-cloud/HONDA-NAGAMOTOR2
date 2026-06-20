@@ -46,7 +46,7 @@ app.post('/api/data', async (req, res) => {
         upsert: true,
       },
     }))
-    await Section.bulkWrite(ops)
+    if (ops.length > 0) await Section.bulkWrite(ops)
     res.json({ success: true })
   } catch (e) {
     console.error('POST /api/data error:', e)
