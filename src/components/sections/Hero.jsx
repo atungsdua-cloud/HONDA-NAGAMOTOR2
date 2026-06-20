@@ -191,23 +191,24 @@ function AnimatedCounter({ value, suffix }) {
   const [started, setStarted] = useState(false)
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-50px' })
+  const num = parseInt(String(value).replace(/\D/g, ''), 10) || 0
   useEffect(() => {
-    if (!inView || started) return
+    if (!inView || started || num === 0) return
     setStarted(true)
     const duration = 2000
     const steps = 60
-    const increment = value / steps
+    const increment = num / steps
     let current = 0
     const timer = setInterval(() => {
       current += increment
-      if (current >= value) {
-        setCount(value)
+      if (current >= num) {
+        setCount(num)
         clearInterval(timer)
       } else {
         setCount(Math.floor(current))
       }
     }, duration / steps)
     return () => clearInterval(timer)
-  }, [inView, value, started])
+  }, [inView, num, started])
   return <span ref={ref}>{count}{suffix}</span>
 }

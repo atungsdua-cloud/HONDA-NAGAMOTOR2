@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { FiMapPin, FiPhone, FiMail, FiInstagram, FiFacebook, FiTwitter } from 'react-icons/fi'
 import { FaTiktok } from 'react-icons/fa'
+import { useData } from '../../context/DataContext'
 
 const quickLinks = [
   { label: 'Beranda', href: '/' },
@@ -11,6 +12,19 @@ const quickLinks = [
 ]
 
 export default function Footer() {
+  const { data } = useData()
+  const contact = data.contact || {}
+  const profile = data.profile || {}
+  const socialMedia = contact.socialMedia || profile.socialMedia || []
+  const phone = contact.phone || profile.phone || '+62 812 3456 7890'
+  const email = contact.email || profile.email || 'sales@hondanagamotor.com'
+  const address = contact.address || profile.address || 'Jl. Raya Contoh No. 123, Jakarta Selatan'
+
+  const getSocialUrl = (platform) => {
+    const found = socialMedia.find(s => s.platform === platform)
+    return found?.url || '#'
+  }
+
   return (
     <footer className="relative bg-dark text-white overflow-hidden">
       <div className="absolute inset-0 bg-grid opacity-20" />
@@ -29,10 +43,10 @@ export default function Footer() {
             </p>
             <div className="flex gap-3">
               {[
-                { icon: FiInstagram, href: '#', label: 'Instagram' },
-                { icon: FiFacebook, href: '#', label: 'Facebook' },
-                { icon: FiTwitter, href: '#', label: 'Twitter' },
-                { icon: FaTiktok, href: '#', label: 'TikTok' },
+                { icon: FiInstagram, href: getSocialUrl('instagram'), label: 'Instagram' },
+                { icon: FiFacebook, href: getSocialUrl('facebook'), label: 'Facebook' },
+                { icon: FiTwitter, href: getSocialUrl('twitter'), label: 'Twitter' },
+                { icon: FaTiktok, href: getSocialUrl('tiktok'), label: 'TikTok' },
               ].map(({ icon: Icon, href, label }) => (
                 <motion.a
                   key={label}
@@ -68,15 +82,15 @@ export default function Footer() {
             <ul className="space-y-4">
               <li className="flex items-start gap-3 text-gray-400 text-sm">
                 <FiMapPin className="mt-0.5 text-honda-red flex-shrink-0" />
-                <span>Jl. Raya Contoh No. 123, Jakarta Selatan</span>
+                <span>{address}</span>
               </li>
               <li className="flex items-center gap-3 text-gray-400 text-sm">
                 <FiPhone className="text-honda-red flex-shrink-0" />
-                <span>+62 812 3456 7890</span>
+                <span>{phone}</span>
               </li>
               <li className="flex items-center gap-3 text-gray-400 text-sm">
                 <FiMail className="text-honda-red flex-shrink-0" />
-                <span>sales@hondanagamotor.com</span>
+                <span>{email}</span>
               </li>
             </ul>
           </div>

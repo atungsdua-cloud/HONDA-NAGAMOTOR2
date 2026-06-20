@@ -1,8 +1,9 @@
-const PHONE_NUMBER = '6281234567890'
+const FALLBACK_PHONE = '6281234567890'
 
-export function getWhatsAppLink(message = '') {
+export function getWhatsAppLink(message = '', phone) {
+  const number = phone || FALLBACK_PHONE
   const text = encodeURIComponent(message || 'Hallo Kak, saya tertarik dengan mobil Honda.')
-  return `https://wa.me/${PHONE_NUMBER}?text=${text}`
+  return `https://wa.me/${number}?text=${text}`
 }
 
 export function getProductWhatsApp(productName) {

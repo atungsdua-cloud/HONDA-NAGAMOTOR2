@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:server": "concurrently -n \"vite,express\" -c \"cyan,green\" \"vite\" \"node server.js\"",
+    "dev:server": "concurrently -n \"vite,express\" -c \"cyan,green\" \"vite\" \"node server.cjs\"",
     "build": "vite build",
     "postinstall": "npm run build",
     "start": "node server.cjs",

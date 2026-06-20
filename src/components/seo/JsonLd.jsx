@@ -53,21 +53,29 @@ export function FaqJsonLd({ faqs }) {
 }
 
 export function LocalBusinessJsonLd() {
+  const { data } = useData()
+  const contact = data.contact || {}
+  const profile = data.profile || {}
+  const socialMedia = contact.socialMedia || profile.socialMedia || []
+  const getSocialUrl = (platform) => {
+    const found = socialMedia.find(s => s.platform === platform)
+    return found?.url || ''
+  }
   const json = {
     '@context': 'https://schema.org',
     '@type': 'AutoDealer',
-    name: 'Honda Nagamotor',
+    name: profile.namaPerusahaan || 'Honda Nagamotor',
     description: 'Dealer Resmi Honda',
     url: window.location.origin,
-    telephone: '+6281234567890',
-    email: 'sales@hondanagamotor.com',
+    telephone: contact.phone || profile.phone || '+6281234567890',
+    email: contact.email || profile.email || 'sales@hondanagamotor.com',
     address: {
       '@type': 'PostalAddress',
-      streetAddress: 'Jl. Raya Contoh No. 123',
-      addressLocality: 'Jakarta Selatan',
+      streetAddress: contact.address || profile.address || 'Jl. Raya Contoh No. 123',
+      addressLocality: contact.kota || profile.kota || 'Jakarta Selatan',
       addressCountry: 'ID',
     },
-    sameAs: ['#', '#', '#'],
+    sameAs: [getSocialUrl('instagram'), getSocialUrl('facebook'), getSocialUrl('twitter')].filter(Boolean),
   }
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(json) }} />
 }

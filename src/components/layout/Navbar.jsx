@@ -12,8 +12,8 @@ export default function Navbar() {
   const { navbar } = data
   const menuItems = navbar?.menuItems || []
   const logoImage = navbar?.logoImage || ''
-  const logoText = navbar?.logoText || 'HONDA'
-  const logoSubtext = navbar?.logoSubtext || 'Nagamotor'
+  const logoText = navbar?.logoText === '' ? '' : (navbar?.logoText || 'HONDA')
+  const logoSubtext = navbar?.logoSubtext === '' ? '' : (navbar?.logoSubtext || 'Nagamotor')
   const ctaText = navbar?.ctaText || 'Hubungi Saya'
   const ctaUrl = navbar?.ctaUrl || getWhatsAppLink()
 

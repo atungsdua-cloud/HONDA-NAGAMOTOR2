@@ -71,9 +71,10 @@ export default function Testimoni() {
                 <div className="flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-12">
                   <div className="flex-shrink-0">
                     <img
-                      src={testimonials[current]?.photo}
+                      src={testimonials[current]?.photo || 'https://placehold.co/160x160?text=User'}
                       alt={testimonials[current]?.name || 'Testimoni'}
                       className="w-32 h-32 sm:w-40 sm:h-40 rounded-2xl object-cover ring-4 ring-honda-red/20 shadow-lg"
+                      onError={(e) => { if (e.target.src !== 'https://placehold.co/160x160?text=User') e.target.src = 'https://placehold.co/160x160?text=User' }}
                     />
                   </div>
                   <div className="flex-1 text-center md:text-left">

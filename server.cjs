@@ -3,6 +3,12 @@ const { join } = require('path')
 const { readFileSync, writeFileSync, existsSync } = require('fs')
 
 const DATA_FILE = join(__dirname, 'data.json')
+
+if (!existsSync(DATA_FILE)) {
+  writeFileSync(DATA_FILE, '{}', 'utf-8')
+  console.log('data.json dibuat')
+}
+
 const app = express()
 const PORT = process.env.PORT || 3000
 

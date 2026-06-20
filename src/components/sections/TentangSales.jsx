@@ -30,9 +30,10 @@ export default function TentangSales() {
             <div className="relative w-72 h-72 sm:w-80 sm:h-80 mx-auto max-w-full">
               <div className="absolute inset-0 bg-gradient-to-br from-honda-red to-red-800 rounded-2xl rotate-6" />
               <img
-                src={profile.photo}
+                src={profile.photo || 'https://placehold.co/400x400?text=Sales'}
                 alt={profile.name}
                 className="relative w-full h-full object-cover rounded-2xl shadow-xl"
+                onError={(e) => { if (e.target.src !== 'https://placehold.co/400x400?text=Sales') e.target.src = 'https://placehold.co/400x400?text=Sales' }}
               />
               <div className="absolute -bottom-4 -right-4 bg-honda-red text-white px-4 py-2 rounded-xl shadow-lg">
                 <div className="font-poppins font-bold text-lg">{profile.experience?.split(' ')[0] || '10+'}</div>

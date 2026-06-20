@@ -33,6 +33,43 @@ const gradientPresets = [
   { value: 'from-gray-800 to-black', label: 'Hitam', style: 'linear-gradient(135deg, #1f2937, #000000)' },
 ]
 
+function ImagesFieldInput({ value, onChange, fileRef }) {
+  const [loading, setLoading] = useState(false)
+  const imagesRef = useRef([])
+  imagesRef.current = Array.isArray(value) ? value : []
+  const images = imagesRef.current
+  const handleFiles = async (files) => {
+    const valid = Array.from(files).filter(f => f.type.startsWith('image/'))
+    if (valid.length === 0) return
+    setLoading(true)
+    const results = await Promise.allSettled(valid.map(f => compressImage(f)))
+    const urls = results.filter(r => r.status === 'fulfilled').map(r => r.value)
+    if (fileRef.current) fileRef.current.value = ''
+    setLoading(false)
+    onChange([...imagesRef.current, ...urls])
+  }
+  return (
+    <div className="space-y-2">
+      {images.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {images.map((url, i) => (
+            <div key={i} className="relative group">
+              <img src={url} alt="" className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover border" />
+              <button onClick={() => onChange(images.filter((_, idx) => idx !== i))}
+                className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow text-[10px]"><FiX /></button>
+            </div>
+          ))}
+        </div>
+      )}
+      <div onClick={() => { if (!loading) fileRef.current?.click() }} className={`border-2 border-dashed rounded-xl py-3 text-center cursor-pointer transition-all ${loading ? 'border-honda-red bg-honda-red/5' : 'border-gray-300 dark:border-gray-600 hover:border-honda-red hover:bg-honda-red/5'}`}>
+        <input ref={fileRef} type="file" multiple accept="image/*" onChange={e => handleFiles(e.target.files)} className="hidden" />
+        {loading ? <FiLoader className="mx-auto mb-0.5 text-honda-red animate-spin" size={18} /> : <FiImage className="mx-auto mb-0.5 text-gray-400" size={18} />}
+        <p className="text-[11px] text-gray-400">{loading ? 'Memproses...' : images.length > 0 ? 'Tambah lagi' : 'Upload gambar'}</p>
+      </div>
+    </div>
+  )
+}
+
 function FieldInput({ field, value, onChange, autoFocus }) {
   const ref = useRef(null)
   const fileRef = useRef(null)
@@ -48,40 +85,7 @@ function FieldInput({ field, value, onChange, autoFocus }) {
     return <ImageFieldInput value={value} onChange={onChange} />
   }
   if (field.type === 'images') {
-    const [loading, setLoading] = useState(false)
-    const imagesRef = useRef([])
-    imagesRef.current = Array.isArray(value) ? value : []
-    const images = imagesRef.current
-    const handleFiles = async (files) => {
-      const valid = Array.from(files).filter(f => f.type.startsWith('image/'))
-      if (valid.length === 0) return
-      setLoading(true)
-      const results = await Promise.allSettled(valid.map(f => compressImage(f)))
-      const urls = results.filter(r => r.status === 'fulfilled').map(r => r.value)
-      if (fileRef.current) fileRef.current.value = ''
-      setLoading(false)
-      onChange([...imagesRef.current, ...urls])
-    }
-    return (
-      <div className="space-y-2">
-        {images.length > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {images.map((url, i) => (
-              <div key={i} className="relative group">
-                <img src={url} alt="" className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover border" />
-                <button onClick={() => onChange(images.filter((_, idx) => idx !== i))}
-                  className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow text-[10px]"><FiX /></button>
-              </div>
-            ))}
-          </div>
-        )}
-        <div onClick={() => { if (!loading) fileRef.current?.click() }} className={`border-2 border-dashed rounded-xl py-3 text-center cursor-pointer transition-all ${loading ? 'border-honda-red bg-honda-red/5' : 'border-gray-300 dark:border-gray-600 hover:border-honda-red hover:bg-honda-red/5'}`}>
-          <input ref={fileRef} type="file" multiple accept="image/*" onChange={e => handleFiles(e.target.files)} className="hidden" />
-          {loading ? <FiLoader className="mx-auto mb-0.5 text-honda-red animate-spin" size={18} /> : <FiImage className="mx-auto mb-0.5 text-gray-400" size={18} />}
-          <p className="text-[11px] text-gray-400">{loading ? 'Memproses...' : images.length > 0 ? 'Tambah lagi' : 'Upload gambar'}</p>
-        </div>
-      </div>
-    )
+    return <ImagesFieldInput value={value} onChange={onChange} fileRef={fileRef} />
   }
   if (field.type === 'colors') {
     const colors = Array.isArray(value) ? value : []

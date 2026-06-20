@@ -1,6 +1,0 @@
-export const products = []
-export const promotions = []
-export const testimonials = []
-export const gallery = []
-export const faqs = []
-export const advantages = []

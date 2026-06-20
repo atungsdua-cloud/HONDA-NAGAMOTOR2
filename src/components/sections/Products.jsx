@@ -14,12 +14,11 @@ const fadeUp = {
   }),
 }
 
-const filterCategories = ['Semua', 'Hatchback', 'Mini SUV', 'SUV 7-Seater', 'Crossover SUV', 'SUV Premium', 'Sedan', 'Sedan Premium', 'Hatchback Premium']
-
 export default function Products() {
   const { data } = useData()
   const products = data.products || []
   const [activeFilter, setActiveFilter] = useState('Semua')
+  const filterCategories = ['Semua', ...new Set(products.map(p => p.type).filter(Boolean))]
 
   const filtered = activeFilter === 'Semua'
     ? products

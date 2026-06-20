@@ -172,7 +172,6 @@ function SectionTitle({ children, accent }) {
 }
 
 function FeaturedImage({ images, slideIndex, setSlideIndex, onImageClick }) {
-  if (!images.length) return null
   useEffect(() => {
     if (images.length <= 1) return
     const interval = setInterval(() => {
@@ -180,6 +179,8 @@ function FeaturedImage({ images, slideIndex, setSlideIndex, onImageClick }) {
     }, 5000)
     return () => clearInterval(interval)
   }, [images.length, setSlideIndex])
+
+  if (!images.length) return null
 
   return (
     <section className="bg-gray-100 dark:bg-gray-900">

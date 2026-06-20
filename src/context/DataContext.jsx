@@ -145,7 +145,7 @@ export function DataProvider({ children }) {
 
   const updateNavbar = useCallback((updates) => {
     const { loading, ...navbarUpdates } = updates
-    setData(prev => ({ ...prev, navbar: { ...prev.navbar, ...navbarUpdates }, loading: { ...prev.loading, ...loading } }))
+    setData(prev => ({ ...prev, navbar: { ...prev.navbar, ...navbarUpdates }, loadingScreen: { ...prev.loadingScreen, ...loading } }))
     setLastUpdate(Date.now())
   }, [])
 
