@@ -565,7 +565,12 @@ function AdminNavbar() {
   const handleSave = async () => {
     const { menuItems, logoImage, logoText, logoSubtext, ctaText, ctaUrl, loading } = form
     updateNavbar({ menuItems, logoImage, logoText, logoSubtext, ctaText, ctaUrl, loading })
-    const ok = await saveNow()
+    const updated = {
+      ...data,
+      navbar: { ...data.navbar, menuItems, logoImage, logoText, logoSubtext, ctaText, ctaUrl },
+      loadingScreen: { ...data.loadingScreen, ...loading },
+    }
+    const ok = await saveNow(updated)
     addToast(ok ? 'Berhasil disimpan' : 'Gagal menyimpan ke server', ok ? 'success' : 'error')
   }
   const addMenuItem = () => setForm(prev => ({ ...prev, menuItems: [...prev.menuItems, { label: '', section: '' }] }))

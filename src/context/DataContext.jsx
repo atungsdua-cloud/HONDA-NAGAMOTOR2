@@ -156,13 +156,14 @@ export function DataProvider({ children }) {
     setLastUpdate(Date.now())
   }, [])
 
-  const saveNow = useCallback(async () => {
+  const saveNow = useCallback(async (customData) => {
     if (saveTimer.current) clearTimeout(saveTimer.current)
+    const body = customData !== undefined ? customData : data
     try {
       const res = await fetch(API_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify(body),
       })
       if (res.ok) {
         setSaveError(null)
