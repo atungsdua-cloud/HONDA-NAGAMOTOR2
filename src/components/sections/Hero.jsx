@@ -100,14 +100,8 @@ export default function Hero() {
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-honda-red/40 to-transparent z-10" />
 
       {/* Overlay layers */}
-      <div className="absolute inset-0 bg-gradient-to-r from-gray-950/95 via-gray-950/70 to-gray-950/40" />
-      <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/30 to-transparent" />
-      <div className="absolute inset-0" style={{
-        background: `radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.5) 100%)`,
-      }} />
-
-      {/* Vignette overlay */}
-      <div className="absolute inset-0 shadow-[inset_0_0_100px_rgba(0,0,0,0.4)]" />
+      <div className="absolute inset-0 bg-gradient-to-r from-gray-950/60 via-gray-950/20 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-gray-950/40 to-transparent" />
 
       {/* Content */}
       <motion.div
