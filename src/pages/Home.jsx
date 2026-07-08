@@ -22,7 +22,7 @@ export default function Home() {
   if (loading) {
     return (
       <PageTransition>
-        <main id="main-content">
+        <main id="main-content" className="pb-16 lg:pb-0">
           <HeroSkeleton />
           <section className="py-20 lg:py-28 bg-light dark:bg-gray-900">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -52,7 +52,7 @@ export default function Home() {
 
   return (
     <PageTransition>
-      <main id="main-content">
+      <main id="main-content" className="pb-16 lg:pb-0">
         <Hero />
         <Products />
         <Promo />

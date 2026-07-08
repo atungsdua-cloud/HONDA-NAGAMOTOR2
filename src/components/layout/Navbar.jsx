@@ -182,7 +182,7 @@ export default function Navbar() {
 
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className={`lg:hidden p-2 rounded-lg transition-colors ${
+              className={`hidden p-2 rounded-lg transition-colors ${
                 scrolled ? (isDark ? 'text-white hover:bg-gray-800' : 'text-gray-700 hover:bg-gray-100') : 'text-white/80 hover:bg-white/10'
               }`}
               aria-label="Toggle menu"

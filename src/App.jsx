@@ -4,6 +4,7 @@ import { AnimatePresence } from 'framer-motion'
 import { DataProvider } from './context/DataContext'
 import { ToastProvider } from './context/ToastContext'
 import Navbar from './components/layout/Navbar'
+import BottomNav from './components/layout/BottomNav'
 import Footer from './components/layout/Footer'
 import FloatingWhatsApp from './components/layout/FloatingWhatsApp'
 import ScrollToTopBtn from './components/layout/ScrollToTop'
@@ -56,6 +57,7 @@ export default function App() {
                 Langsung ke konten utama
               </a>
               <Navbar />
+              <BottomNav />
               <AnimatePresence mode="wait">
                 <Routes location={location} key={location.pathname}>
                   <Route path="/" element={<Home />} />
