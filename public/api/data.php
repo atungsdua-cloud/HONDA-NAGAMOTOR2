@@ -209,18 +209,16 @@ function writeData($conn, $data) {
         if (isset($data['profile'])) {
             $p = $data['profile'];
             $stmt = $conn->prepare("UPDATE profile SET name=?, title=?, description=?, photo=?, experience=?, phone=?, email=?, address=? WHERE id=1");
-            $stmt->bind_param('ssssssss',
+            $stmt->execute([
                 $p['name'] ?? '', $p['title'] ?? '', $p['description'] ?? '', $p['photo'] ?? '',
                 $p['experience'] ?? '', $p['phone'] ?? '', $p['email'] ?? '', $p['address'] ?? ''
-            );
-            $stmt->execute();
+            ]);
 
             if (isset($p['stats'])) {
                 $conn->query("DELETE FROM profile_stats WHERE profile_id = 1");
                 $stmt = $conn->prepare("INSERT INTO profile_stats (profile_id, icon, value, label, sort_order) VALUES (1, ?, ?, ?, ?)");
                 foreach ($p['stats'] as $i => $s) {
-                    $stmt->bind_param('sssi', $s['icon'], $s['value'], $s['label'], $i + 1);
-                    $stmt->execute();
+                    $stmt->execute([$s['icon'], $s['value'], $s['label'], $i + 1]);
                 }
             }
         }
@@ -228,23 +226,20 @@ function writeData($conn, $data) {
         if (isset($data['hero'])) {
             $h = $data['hero'];
             $stmt = $conn->prepare("UPDATE hero SET title=?, subtitle=?, sales_photo=? WHERE id=1");
-            $stmt->bind_param('sss', $h['title'] ?? '', $h['subtitle'] ?? '', $h['salesPhoto'] ?? '');
-            $stmt->execute();
+            $stmt->execute([$h['title'] ?? '', $h['subtitle'] ?? '', $h['salesPhoto'] ?? '']);
 
             if (isset($h['images'])) {
                 $conn->query("DELETE FROM hero_images WHERE hero_id = 1");
                 $stmt = $conn->prepare("INSERT INTO hero_images (hero_id, url, sort_order) VALUES (1, ?, ?)");
                 foreach ($h['images'] as $i => $url) {
-                    $stmt->bind_param('si', $url, $i + 1);
-                    $stmt->execute();
+                    $stmt->execute([$url, $i + 1]);
                 }
             }
             if (isset($h['stats'])) {
                 $conn->query("DELETE FROM hero_stats WHERE hero_id = 1");
                 $stmt = $conn->prepare("INSERT INTO hero_stats (hero_id, icon, value, label, suffix, sort_order) VALUES (1, ?, ?, ?, ?, ?)");
                 foreach ($h['stats'] as $i => $s) {
-                    $stmt->bind_param('ssssi', $s['icon'], $s['value'], $s['label'], $s['suffix'] ?? '', $i + 1);
-                    $stmt->execute();
+                    $stmt->execute([$s['icon'], $s['value'], $s['label'], $s['suffix'] ?? '', $i + 1]);
                 }
             }
         }
@@ -252,18 +247,16 @@ function writeData($conn, $data) {
         if (isset($data['navbar'])) {
             $n = $data['navbar'];
             $stmt = $conn->prepare("UPDATE navbar SET logo_image=?, logo_text=?, logo_subtext=?, cta_text=?, cta_url=? WHERE id=1");
-            $stmt->bind_param('sssss',
+            $stmt->execute([
                 $n['logoImage'] ?? '', $n['logoText'] ?? 'HONDA', $n['logoSubtext'] ?? 'Nagamotor',
                 $n['ctaText'] ?? 'Hubungi Saya', $n['ctaUrl'] ?? ''
-            );
-            $stmt->execute();
+            ]);
 
             if (isset($n['menuItems'])) {
                 $conn->query("DELETE FROM navbar_menu_items WHERE navbar_id = 1");
                 $stmt = $conn->prepare("INSERT INTO navbar_menu_items (navbar_id, label, section, sort_order) VALUES (1, ?, ?, ?)");
                 foreach ($n['menuItems'] as $i => $m) {
-                    $stmt->bind_param('ssi', $m['label'], $m['section'], $i + 1);
-                    $stmt->execute();
+                    $stmt->execute([$m['label'], $m['section'], $i + 1]);
                 }
             }
         }
@@ -271,22 +264,19 @@ function writeData($conn, $data) {
         if (isset($data['loadingScreen'])) {
             $l = $data['loadingScreen'];
             $stmt = $conn->prepare("UPDATE loading_screen SET title=?, subtext=?, tagline=? WHERE id=1");
-            $stmt->bind_param('sss', $l['title'] ?? 'HONDA', $l['subtext'] ?? 'NAGAMOTOR', $l['tagline'] ?? 'Dealer Resmi Honda');
-            $stmt->execute();
+            $stmt->execute([$l['title'] ?? 'HONDA', $l['subtext'] ?? 'NAGAMOTOR', $l['tagline'] ?? 'Dealer Resmi Honda']);
         }
 
         if (isset($data['contact'])) {
             $c = $data['contact'];
             $stmt = $conn->prepare("UPDATE contact SET phone=?, email=?, address=?, map_url=? WHERE id=1");
-            $stmt->bind_param('ssss', $c['phone'] ?? '', $c['email'] ?? '', $c['address'] ?? '', $c['mapUrl'] ?? '');
-            $stmt->execute();
+            $stmt->execute([$c['phone'] ?? '', $c['email'] ?? '', $c['address'] ?? '', $c['mapUrl'] ?? '']);
 
             if (isset($c['socialMedia'])) {
                 $conn->query("DELETE FROM contact_social_media WHERE contact_id = 1");
                 $stmt = $conn->prepare("INSERT INTO contact_social_media (contact_id, platform, url, icon, sort_order) VALUES (1, ?, ?, ?, ?)");
                 foreach ($c['socialMedia'] as $i => $s) {
-                    $stmt->bind_param('sssi', $s['platform'], $s['url'], $s['icon'], $i + 1);
-                    $stmt->execute();
+                    $stmt->execute([$s['platform'], $s['url'], $s['icon'], $i + 1]);
                 }
             }
         }
@@ -303,32 +293,25 @@ function writeData($conn, $data) {
                 }
                 if ($pid) {
                     $stmt = $conn->prepare("UPDATE products SET name=?, tagline=?, type=?, engine=?, fuel=?, image=?, description=?, specs_json=?, features_json=?, colors_json=?, price=? WHERE id=?");
-                    $specs = json_encode($p['specs'] ?? []);
-                    $features = json_encode($p['features'] ?? []);
-                    $colors = json_encode($p['colors'] ?? []);
-                    $stmt->bind_param('sssssssssssi',
+                    $stmt->execute([
                         $p['name'] ?? '', $p['tagline'] ?? '', $p['type'] ?? '', $p['engine'] ?? '',
                         $p['fuel'] ?? '', $p['image'] ?? '', $p['description'] ?? '',
-                        $specs, $features, $colors, $p['price'] ?? '', $pid
-                    );
-                    $stmt->execute();
+                        json_encode($p['specs'] ?? []), json_encode($p['features'] ?? []),
+                        json_encode($p['colors'] ?? []), $p['price'] ?? '', $pid
+                    ]);
                 } else {
                     $stmt = $conn->prepare("INSERT INTO products (name, tagline, type, engine, fuel, image, description, specs_json, features_json, colors_json, price) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                    $specs = json_encode($p['specs'] ?? []);
-                    $features = json_encode($p['features'] ?? []);
-                    $colors = json_encode($p['colors'] ?? []);
-                    $stmt->bind_param('sssssssssss',
+                    $stmt->execute([
                         $p['name'] ?? '', $p['tagline'] ?? '', $p['type'] ?? '', $p['engine'] ?? '',
                         $p['fuel'] ?? '', $p['image'] ?? '', $p['description'] ?? '',
-                        $specs, $features, $colors, $p['price'] ?? ''
-                    );
-                    $stmt->execute();
+                        json_encode($p['specs'] ?? []), json_encode($p['features'] ?? []),
+                        json_encode($p['colors'] ?? []), $p['price'] ?? ''
+                    ]);
                     $newId = $conn->insert_id;
                     if (isset($p['variants'])) {
                         $vStmt = $conn->prepare("INSERT INTO product_variants (product_id, name, price, sort_order) VALUES (?, ?, ?, ?)");
                         foreach ($p['variants'] as $vi => $v) {
-                            $vStmt->bind_param('issi', $newId, $v['name'], $v['price'], $vi + 1);
-                            $vStmt->execute();
+                            $vStmt->execute([$newId, $v['name'], $v['price'], $vi + 1]);
                         }
                     }
                 }
@@ -345,18 +328,16 @@ function writeData($conn, $data) {
                 }
                 if ($pid) {
                     $stmt = $conn->prepare("UPDATE promotions SET title=?, description=?, image=?, discount=?, valid_until=?, color=? WHERE id=?");
-                    $stmt->bind_param('ssssssi',
+                    $stmt->execute([
                         $p['title'] ?? '', $p['description'] ?? '', $p['image'] ?? '',
                         $p['discount'] ?? '', $p['validUntil'] ?? '', $p['color'] ?? 'from-red-600 to-red-800', $pid
-                    );
-                    $stmt->execute();
+                    ]);
                 } else {
                     $stmt = $conn->prepare("INSERT INTO promotions (title, description, image, discount, valid_until, color) VALUES (?, ?, ?, ?, ?, ?)");
-                    $stmt->bind_param('ssssss',
+                    $stmt->execute([
                         $p['title'] ?? '', $p['description'] ?? '', $p['image'] ?? '',
                         $p['discount'] ?? '', $p['validUntil'] ?? '', $p['color'] ?? 'from-red-600 to-red-800'
-                    );
-                    $stmt->execute();
+                    ]);
                 }
             }
         }
@@ -371,14 +352,10 @@ function writeData($conn, $data) {
                 }
                 if ($tid) {
                     $stmt = $conn->prepare("UPDATE testimonials SET name=?, car=?, photo=?, text=?, rating=? WHERE id=?");
-                    $rating = (int)($t['rating'] ?? 5);
-                    $stmt->bind_param('ssssii', $t['name'] ?? '', $t['car'] ?? '', $t['photo'] ?? '', $t['text'] ?? '', $rating, $tid);
-                    $stmt->execute();
+                    $stmt->execute([$t['name'] ?? '', $t['car'] ?? '', $t['photo'] ?? '', $t['text'] ?? '', (int)($t['rating'] ?? 5), $tid]);
                 } else {
                     $stmt = $conn->prepare("INSERT INTO testimonials (name, car, photo, text, rating) VALUES (?, ?, ?, ?, ?)");
-                    $rating = (int)($t['rating'] ?? 5);
-                    $stmt->bind_param('ssssi', $t['name'] ?? '', $t['car'] ?? '', $t['photo'] ?? '', $t['text'] ?? '', $rating);
-                    $stmt->execute();
+                    $stmt->execute([$t['name'] ?? '', $t['car'] ?? '', $t['photo'] ?? '', $t['text'] ?? '', (int)($t['rating'] ?? 5)]);
                 }
             }
         }
@@ -393,12 +370,10 @@ function writeData($conn, $data) {
                 }
                 if ($gid) {
                     $stmt = $conn->prepare("UPDATE gallery SET src=?, alt=? WHERE id=?");
-                    $stmt->bind_param('ssi', $g['src'] ?? '', $g['alt'] ?? '', $gid);
-                    $stmt->execute();
+                    $stmt->execute([$g['src'] ?? '', $g['alt'] ?? '', $gid]);
                 } else {
                     $stmt = $conn->prepare("INSERT INTO gallery (src, alt, sort_order) VALUES (?, ?, ?)");
-                    $stmt->bind_param('ssi', $g['src'] ?? '', $g['alt'] ?? '', $gi + 1);
-                    $stmt->execute();
+                    $stmt->execute([$g['src'] ?? '', $g['alt'] ?? '', $gi + 1]);
                 }
             }
         }
@@ -413,12 +388,10 @@ function writeData($conn, $data) {
                 }
                 if ($fid) {
                     $stmt = $conn->prepare("UPDATE faqs SET question=?, answer=? WHERE id=?");
-                    $stmt->bind_param('ssi', $f['question'] ?? '', $f['answer'] ?? '', $fid);
-                    $stmt->execute();
+                    $stmt->execute([$f['question'] ?? '', $f['answer'] ?? '', $fid]);
                 } else {
                     $stmt = $conn->prepare("INSERT INTO faqs (question, answer, sort_order) VALUES (?, ?, ?)");
-                    $stmt->bind_param('ssi', $f['question'] ?? '', $f['answer'] ?? '', $fi + 1);
-                    $stmt->execute();
+                    $stmt->execute([$f['question'] ?? '', $f['answer'] ?? '', $fi + 1]);
                 }
             }
         }
@@ -433,12 +406,10 @@ function writeData($conn, $data) {
                 }
                 if ($aid) {
                     $stmt = $conn->prepare("UPDATE advantages SET icon=?, title=?, description=? WHERE id=?");
-                    $stmt->bind_param('sssi', $a['icon'] ?? '', $a['title'] ?? '', $a['description'] ?? '', $aid);
-                    $stmt->execute();
+                    $stmt->execute([$a['icon'] ?? '', $a['title'] ?? '', $a['description'] ?? '', $aid]);
                 } else {
                     $stmt = $conn->prepare("INSERT INTO advantages (icon, title, description, sort_order) VALUES (?, ?, ?, ?)");
-                    $stmt->bind_param('sssi', $a['icon'] ?? '', $a['title'] ?? '', $a['description'] ?? '', $ai + 1);
-                    $stmt->execute();
+                    $stmt->execute([$a['icon'] ?? '', $a['title'] ?? '', $a['description'] ?? '', $ai + 1]);
                 }
             }
         }
