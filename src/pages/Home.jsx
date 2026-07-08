@@ -24,14 +24,14 @@ export default function Home() {
       <PageTransition>
         <main id="main-content" className="pb-16 lg:pb-0">
           <HeroSkeleton />
-          <section className="py-20 lg:py-28 bg-light dark:bg-gray-900">
+          <section className="py-14 lg:py-28 bg-light dark:bg-gray-900">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6">
                 {[...Array(4)].map((_, i) => <ProductCardSkeleton key={i} />)}
               </div>
             </div>
           </section>
-          <section className="py-20 lg:py-28 bg-dark">
+          <section className="py-14 lg:py-28 bg-dark">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {[...Array(2)].map((_, i) => (
@@ -40,7 +40,7 @@ export default function Home() {
               </div>
             </div>
           </section>
-          <section className="py-20 lg:py-28 bg-light dark:bg-gray-900">
+          <section className="py-14 lg:py-28 bg-light dark:bg-gray-900">
             <div className="max-w-3xl mx-auto px-4">
               <TestimoniSkeleton />
             </div>

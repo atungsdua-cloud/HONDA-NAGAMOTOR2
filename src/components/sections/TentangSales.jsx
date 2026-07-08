@@ -11,7 +11,7 @@ export default function TentangSales() {
   const profile = data.profile || {}
 
   return (
-    <section id="tentang" className="py-20 lg:py-28 bg-white dark:bg-gray-800 transition-colors duration-500">
+    <section id="tentang" className="py-14 lg:py-28 bg-white dark:bg-gray-800 transition-colors duration-500">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionTitle
           subtitle="TENTANG SAYA"

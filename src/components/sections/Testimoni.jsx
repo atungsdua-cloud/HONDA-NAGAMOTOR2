@@ -41,7 +41,7 @@ export default function Testimoni() {
   }
 
   return (
-    <section id="testimoni" className="py-20 lg:py-28 bg-light dark:bg-gray-900 transition-colors duration-500 overflow-hidden">
+    <section id="testimoni" className="py-14 lg:py-28 bg-light dark:bg-gray-900 transition-colors duration-500 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionTitle
           subtitle="TESTIMONI"

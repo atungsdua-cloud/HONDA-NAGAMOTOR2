@@ -7,7 +7,7 @@ export default function SectionTitle({ subtitle, title, description, light = fal
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5 }}
-      className="text-center max-w-2xl mx-auto mb-12 lg:mb-16"
+      className="text-center max-w-2xl mx-auto mb-8 lg:mb-16"
     >
       <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold tracking-wider uppercase mb-3 ${
         light ? 'bg-white/10 text-white' : 'bg-honda-red/10 text-honda-red'

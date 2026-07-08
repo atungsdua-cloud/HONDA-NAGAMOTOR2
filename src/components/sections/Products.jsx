@@ -25,7 +25,7 @@ export default function Products() {
     : products.filter((p) => p.type === activeFilter)
 
   return (
-    <section id="produk" className="py-20 lg:py-28 bg-light dark:bg-gray-900 transition-colors duration-500">
+    <section id="produk" className="py-14 lg:py-28 bg-light dark:bg-gray-900 transition-colors duration-500">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionTitle
           subtitle="PRODUK KAMI"
@@ -68,7 +68,7 @@ export default function Products() {
               viewport={{ once: true, margin: '-50px' }}
               className="group relative bg-white dark:bg-gray-800 rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700/50 shadow-sm hover:shadow-xl hover:border-honda-red/30 transition-all duration-500"
             >
-              <div className="relative h-52 sm:h-48 overflow-hidden bg-gray-100 dark:bg-gray-700">
+                <div className="relative h-40 sm:h-48 overflow-hidden bg-gray-100 dark:bg-gray-700">
                 <img
                   key={product.image || product.images?.[0] || 'no-img'}
                   src={product.image || product.images?.[0]}
