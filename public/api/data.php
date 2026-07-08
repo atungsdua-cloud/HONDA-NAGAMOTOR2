@@ -10,11 +10,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-// Database config from environment variables
+// Database config — coba dari env var dulu, fallback ke hardcoded
 $dbHost = getenv('DB_HOST') ?: 'localhost';
-$dbUser = getenv('DB_USER') ?: 'root';
-$dbPass = getenv('DB_PASSWORD') ?: '';
-$dbName = getenv('DB_NAME') ?: 'honda_nagamotor';
+$dbUser = getenv('DB_USER') ?: 'u686012864_aldinmt';
+$dbPass = getenv('DB_PASSWORD') ?: 'Nmtsikur123';
+$dbName = getenv('DB_NAME') ?: 'u686012864_honda_lombok';
 $dbPort = getenv('DB_PORT') ?: '3306';
 
 $conn = new mysqli($dbHost, $dbUser, $dbPass, $dbName, (int)$dbPort);
