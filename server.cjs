@@ -65,7 +65,7 @@ async function initDatabase() {
       name TEXT NOT NULL,
       title TEXT NOT NULL,
       description TEXT NOT NULL,
-      photo TEXT DEFAULT '',
+      photo MEDIUMTEXT,
       experience TEXT DEFAULT '',
       phone TEXT DEFAULT '',
       email TEXT DEFAULT '',
@@ -87,14 +87,14 @@ async function initDatabase() {
       id INT PRIMARY KEY DEFAULT 1,
       title TEXT NOT NULL,
       subtitle TEXT NOT NULL,
-      sales_photo TEXT DEFAULT '',
+      sales_photo MEDIUMTEXT,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
 
     `CREATE TABLE IF NOT EXISTS hero_images (
       id INT AUTO_INCREMENT PRIMARY KEY,
       hero_id INT NOT NULL DEFAULT 1,
-      url TEXT NOT NULL,
+      url MEDIUMTEXT NOT NULL,
       sort_order INT NOT NULL DEFAULT 0,
       FOREIGN KEY (hero_id) REFERENCES hero(id) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
@@ -112,7 +112,7 @@ async function initDatabase() {
 
     `CREATE TABLE IF NOT EXISTS navbar (
       id INT PRIMARY KEY DEFAULT 1,
-      logo_image TEXT DEFAULT '',
+      logo_image MEDIUMTEXT,
       logo_text TEXT DEFAULT 'HONDA',
       logo_subtext TEXT DEFAULT 'Nagamotor',
       cta_text TEXT DEFAULT 'Hubungi Saya',
@@ -162,7 +162,7 @@ async function initDatabase() {
       type VARCHAR(100) NOT NULL DEFAULT '',
       engine VARCHAR(100) DEFAULT '',
       fuel VARCHAR(100) DEFAULT '',
-      image TEXT DEFAULT '',
+      image MEDIUMTEXT,
       description TEXT DEFAULT '',
       specs_json LONGTEXT DEFAULT '{}',
       features_json LONGTEXT DEFAULT '[]',
@@ -175,7 +175,7 @@ async function initDatabase() {
     `CREATE TABLE IF NOT EXISTS product_images (
       id INT AUTO_INCREMENT PRIMARY KEY,
       product_id INT NOT NULL,
-      url TEXT NOT NULL,
+      url MEDIUMTEXT NOT NULL,
       sort_order INT NOT NULL DEFAULT 0,
       FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
@@ -193,7 +193,7 @@ async function initDatabase() {
       id INT AUTO_INCREMENT PRIMARY KEY,
       title VARCHAR(200) NOT NULL,
       description TEXT DEFAULT '',
-      image TEXT DEFAULT '',
+      image MEDIUMTEXT,
       discount VARCHAR(100) DEFAULT '',
       valid_until VARCHAR(100) DEFAULT '',
       color VARCHAR(100) DEFAULT 'from-red-600 to-red-800',
@@ -204,7 +204,7 @@ async function initDatabase() {
       id INT AUTO_INCREMENT PRIMARY KEY,
       name VARCHAR(200) NOT NULL,
       car VARCHAR(200) DEFAULT '',
-      photo TEXT DEFAULT '',
+      photo MEDIUMTEXT,
       text TEXT NOT NULL,
       rating INT DEFAULT 5,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -212,7 +212,7 @@ async function initDatabase() {
 
     `CREATE TABLE IF NOT EXISTS gallery (
       id INT AUTO_INCREMENT PRIMARY KEY,
-      src TEXT NOT NULL,
+      src MEDIUMTEXT NOT NULL,
       alt TEXT DEFAULT '',
       sort_order INT NOT NULL DEFAULT 0,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
