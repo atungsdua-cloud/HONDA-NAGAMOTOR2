@@ -1,14 +1,26 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useData } from '../../context/DataContext'
 
 export default function LoadingScreen() {
-  const { data } = useData()
-  const loading = data.loading || {}
+  const { data, loading: dataLoading } = useData()
+  const screen = data.loading || {}
   const [isLoading, setIsLoading] = useState(true)
+  const dataReady = useRef(false)
+  const minElapsed = useRef(false)
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 2000)
+    if (!dataLoading) {
+      dataReady.current = true
+      if (minElapsed.current) setIsLoading(false)
+    }
+  }, [dataLoading])
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      minElapsed.current = true
+      if (dataReady.current) setIsLoading(false)
+    }, 800)
     return () => clearTimeout(timer)
   }, [])
 
@@ -29,10 +41,10 @@ export default function LoadingScreen() {
           >
             <div className="flex flex-col items-center">
               <span className="font-poppins font-black text-honda-red text-3xl sm:text-4xl tracking-[6px] leading-none">
-                {loading.title || 'HONDA'}
+                {screen.title || 'HONDA'}
               </span>
               <span className="font-inter font-medium text-gray-400 text-xs tracking-[8px] mt-1.5">
-                {loading.subtext || 'NAGAMOTOR'}
+                {screen.subtext || 'NAGAMOTOR'}
               </span>
             </div>
 
@@ -51,7 +63,7 @@ export default function LoadingScreen() {
               transition={{ delay: 0.3, duration: 0.6 }}
               className="text-[10px] text-gray-500 tracking-[4px] uppercase"
             >
-              {loading.tagline || 'Dealer Resmi Honda'}
+              {screen.tagline || 'Dealer Resmi Honda'}
             </motion.p>
           </motion.div>
         </motion.div>
