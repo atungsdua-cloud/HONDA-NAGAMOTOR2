@@ -1,6 +1,7 @@
-framework: vite
+framework: node
 build:
   command: npm install && npm run build
   output: dist
 node:
   version: 20
+entry: server.cjs
