@@ -72,7 +72,7 @@ export default function Navbar() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-700 ${
+      className={`hidden lg:block fixed top-0 left-0 right-0 z-50 transition-all duration-700 ${
         scrolled
           ? isDark
             ? 'bg-gray-900/80 backdrop-blur-xl shadow-[0_4px_30px_rgba(0,0,0,0.3)]'

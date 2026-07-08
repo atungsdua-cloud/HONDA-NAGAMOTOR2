@@ -18,8 +18,8 @@ import SocialShare from '../components/ui/SocialShare'
 import ImageLightbox from '../components/ui/ImageLightbox'
 import { ProductJsonLd } from '../components/seo/JsonLd'
 
-const NAV_H = 'top-16 lg:top-[72px]'
-const NAV_PT = 'pt-16 lg:pt-[72px]'
+const NAV_H = 'top-0 lg:top-[72px]'
+const NAV_PT = 'lg:pt-[72px]'
 
 const specIcons = {
   mesin: FiCpu, tenaga: FiZap, torsi: FiActivity, transmisi: FiRepeat,

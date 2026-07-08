@@ -658,8 +658,20 @@ async function writeData(data) {
     }
 
     if (data.products) {
+      // Hapus produk yang ada di DB tapi tidak di data incoming
+      const [existingRows] = await conn.query('SELECT id FROM products')
+      const existingIds = existingRows.map(r => r.id)
+      const incomingIds = data.products
+        .filter(p => p.id && p.id.startsWith('product-'))
+        .map(p => parseInt(p.id.replace('product-', ''), 10))
+        .filter(id => !isNaN(id))
+      const toDelete = existingIds.filter(id => !incomingIds.includes(id))
+      for (const id of toDelete) {
+        await conn.query('DELETE FROM products WHERE id = ?', [id])
+      }
+
       for (const p of data.products) {
-        const pid = p.id && parseInt(p.id.replace('product-', ''))
+        const pid = p.id && parseInt(p.id.replace('product-', ''), 10)
         const [existing] = pid ? await conn.query('SELECT id FROM products WHERE id = ?', [pid]) : [[]]
         if (existing && existing[0]) {
           await conn.query(
@@ -669,6 +681,22 @@ async function writeData(data) {
              p.description || '', JSON.stringify(p.specs || {}), JSON.stringify(p.features || []),
              JSON.stringify(p.colors || []), p.price || '', existing[0].id]
           )
+          // Replace variants
+          await conn.query('DELETE FROM product_variants WHERE product_id = ?', [existing[0].id])
+          if (p.variants) {
+            for (let i = 0; i < p.variants.length; i++) {
+              await conn.query('INSERT INTO product_variants (product_id, name, price, sort_order) VALUES (?, ?, ?, ?)',
+                [existing[0].id, p.variants[i].name, p.variants[i].price, i + 1])
+            }
+          }
+          // Replace images
+          await conn.query('DELETE FROM product_images WHERE product_id = ?', [existing[0].id])
+          if (p.images) {
+            for (let i = 0; i < p.images.length; i++) {
+              await conn.query('INSERT INTO product_images (product_id, url, sort_order) VALUES (?, ?, ?)',
+                [existing[0].id, p.images[i], i + 1])
+            }
+          }
         } else {
           const [result] = await conn.query(
             `INSERT INTO products (name, tagline, type, engine, fuel, image, description, specs_json, features_json, colors_json, price)
@@ -683,13 +711,29 @@ async function writeData(data) {
                 [result.insertId, p.variants[i].name, p.variants[i].price, i + 1])
             }
           }
+          if (p.images) {
+            for (let i = 0; i < p.images.length; i++) {
+              await conn.query('INSERT INTO product_images (product_id, url, sort_order) VALUES (?, ?, ?)',
+                [result.insertId, p.images[i], i + 1])
+            }
+          }
         }
       }
     }
 
     if (data.promotions) {
+      const [existingRows] = await conn.query('SELECT id FROM promotions')
+      const existingIds = existingRows.map(r => r.id)
+      const incomingIds = data.promotions
+        .filter(p => p.id && p.id.startsWith('promotion-'))
+        .map(p => parseInt(p.id.replace('promotion-', ''), 10))
+        .filter(id => !isNaN(id))
+      const toDelete = existingIds.filter(id => !incomingIds.includes(id))
+      for (const id of toDelete) {
+        await conn.query('DELETE FROM promotions WHERE id = ?', [id])
+      }
       for (const p of data.promotions) {
-        const pid = p.id && parseInt(p.id.replace('promotion-', ''))
+        const pid = p.id && parseInt(p.id.replace('promotion-', ''), 10)
         const [existing] = pid ? await conn.query('SELECT id FROM promotions WHERE id = ?', [pid]) : [[]]
         if (existing && existing[0]) {
           await conn.query(
@@ -706,8 +750,18 @@ async function writeData(data) {
     }
 
     if (data.testimonials) {
+      const [existingRows] = await conn.query('SELECT id FROM testimonials')
+      const existingIds = existingRows.map(r => r.id)
+      const incomingIds = data.testimonials
+        .filter(t => t.id && t.id.startsWith('testimonial-'))
+        .map(t => parseInt(t.id.replace('testimonial-', ''), 10))
+        .filter(id => !isNaN(id))
+      const toDelete = existingIds.filter(id => !incomingIds.includes(id))
+      for (const id of toDelete) {
+        await conn.query('DELETE FROM testimonials WHERE id = ?', [id])
+      }
       for (const t of data.testimonials) {
-        const tid = t.id && parseInt(t.id.replace('testimonial-', ''))
+        const tid = t.id && parseInt(t.id.replace('testimonial-', ''), 10)
         const [existing] = tid ? await conn.query('SELECT id FROM testimonials WHERE id = ?', [tid]) : [[]]
         if (existing && existing[0]) {
           await conn.query(
@@ -724,8 +778,18 @@ async function writeData(data) {
     }
 
     if (data.gallery) {
+      const [existingRows] = await conn.query('SELECT id FROM gallery')
+      const existingIds = existingRows.map(r => r.id)
+      const incomingIds = data.gallery
+        .filter(g => g.id && g.id.startsWith('gallery-'))
+        .map(g => parseInt(g.id.replace('gallery-', ''), 10))
+        .filter(id => !isNaN(id))
+      const toDelete = existingIds.filter(id => !incomingIds.includes(id))
+      for (const id of toDelete) {
+        await conn.query('DELETE FROM gallery WHERE id = ?', [id])
+      }
       for (const g of data.gallery) {
-        const gid = g.id && parseInt(g.id.replace('gallery-', ''))
+        const gid = g.id && parseInt(g.id.replace('gallery-', ''), 10)
         const [existing] = gid ? await conn.query('SELECT id FROM gallery WHERE id = ?', [gid]) : [[]]
         if (existing && existing[0]) {
           await conn.query('UPDATE gallery SET src = ?, alt = ? WHERE id = ?', [g.src || '', g.alt || '', existing[0].id])
@@ -736,8 +800,18 @@ async function writeData(data) {
     }
 
     if (data.faqs) {
+      const [existingRows] = await conn.query('SELECT id FROM faqs')
+      const existingIds = existingRows.map(r => r.id)
+      const incomingIds = data.faqs
+        .filter(f => f.id && f.id.startsWith('faq-'))
+        .map(f => parseInt(f.id.replace('faq-', ''), 10))
+        .filter(id => !isNaN(id))
+      const toDelete = existingIds.filter(id => !incomingIds.includes(id))
+      for (const id of toDelete) {
+        await conn.query('DELETE FROM faqs WHERE id = ?', [id])
+      }
       for (const f of data.faqs) {
-        const fid = f.id && parseInt(f.id.replace('faq-', ''))
+        const fid = f.id && parseInt(f.id.replace('faq-', ''), 10)
         const [existing] = fid ? await conn.query('SELECT id FROM faqs WHERE id = ?', [fid]) : [[]]
         if (existing && existing[0]) {
           await conn.query('UPDATE faqs SET question = ?, answer = ? WHERE id = ?', [f.question || '', f.answer || '', existing[0].id])
@@ -748,8 +822,18 @@ async function writeData(data) {
     }
 
     if (data.advantages) {
+      const [existingRows] = await conn.query('SELECT id FROM advantages')
+      const existingIds = existingRows.map(r => r.id)
+      const incomingIds = data.advantages
+        .filter(a => a.id && a.id.startsWith('advantage-'))
+        .map(a => parseInt(a.id.replace('advantage-', ''), 10))
+        .filter(id => !isNaN(id))
+      const toDelete = existingIds.filter(id => !incomingIds.includes(id))
+      for (const id of toDelete) {
+        await conn.query('DELETE FROM advantages WHERE id = ?', [id])
+      }
       for (const a of data.advantages) {
-        const aid = a.id && parseInt(a.id.replace('advantage-', ''))
+        const aid = a.id && parseInt(a.id.replace('advantage-', ''), 10)
         const [existing] = aid ? await conn.query('SELECT id FROM advantages WHERE id = ?', [aid]) : [[]]
         if (existing && existing[0]) {
           await conn.query('UPDATE advantages SET icon = ?, title = ?, description = ? WHERE id = ?',
