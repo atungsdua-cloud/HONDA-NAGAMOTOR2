@@ -217,7 +217,7 @@ function AdminDataTools() {
 }
 
 function AdminHero() {
-  const { data, updateHero } = useData()
+  const { data, updateHero, saveNow } = useData()
   const { addToast } = useToast()
   const [form, setForm] = useState({ ...data.hero })
   const [uploading, setUploading] = useState(false)
@@ -225,7 +225,11 @@ function AdminHero() {
 
   useEffect(() => { setForm({ ...data.hero }) }, [data.hero])
 
-  const handleSave = () => { updateHero(form); addToast('Hero berhasil diperbarui', 'success') }
+  const handleSave = () => {
+    updateHero(form)
+    saveNow({ ...data, hero: { ...data.hero, ...form } })
+    addToast('Hero berhasil diperbarui', 'success')
+  }
 
   const handleFiles = async (files) => {
     const valid = Array.from(files).filter(f => f.type.startsWith('image/'))
@@ -303,13 +307,17 @@ function AdminHero() {
 }
 
 function AdminProfile() {
-  const { data, updateProfile } = useData()
+  const { data, updateProfile, saveNow } = useData()
   const { addToast } = useToast()
   const [form, setForm] = useState({ ...data.profile })
 
   useEffect(() => { setForm({ ...data.profile }) }, [data.profile])
 
-  const handleSave = () => { updateProfile(form); addToast('Profil berhasil diperbarui', 'success') }
+  const handleSave = () => {
+    updateProfile(form)
+    saveNow({ ...data, profile: { ...data.profile, ...form } })
+    addToast('Profil berhasil diperbarui', 'success')
+  }
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl p-4 sm:p-6 border border-gray-200 dark:border-gray-700">
@@ -562,7 +570,7 @@ function AdminNavbar() {
 
   useEffect(() => { setForm({ menuItems: [], ...data.navbar, loading: { ...data.loadingScreen } }) }, [data.navbar, data.loadingScreen])
 
-  const handleSave = async () => {
+  const handleSave = () => {
     const { menuItems, logoImage, logoText, logoSubtext, ctaText, ctaUrl, loading } = form
     updateNavbar({ menuItems, logoImage, logoText, logoSubtext, ctaText, ctaUrl, loading })
     const updated = {
@@ -570,8 +578,8 @@ function AdminNavbar() {
       navbar: { ...data.navbar, menuItems, logoImage, logoText, logoSubtext, ctaText, ctaUrl },
       loadingScreen: { ...data.loadingScreen, ...loading },
     }
-    const ok = await saveNow(updated)
-    addToast(ok ? 'Berhasil disimpan' : 'Gagal menyimpan ke server', ok ? 'success' : 'error')
+    saveNow(updated)
+    addToast('Berhasil disimpan', 'success')
   }
   const addMenuItem = () => setForm(prev => ({ ...prev, menuItems: [...prev.menuItems, { label: '', section: '' }] }))
   const removeMenuItem = (i) => setForm(prev => ({ ...prev, menuItems: prev.menuItems.filter((_, idx) => idx !== i) }))
@@ -676,7 +684,7 @@ const socialIconOptions = [
 ]
 
 function AdminContact() {
-  const { data, updateContact } = useData()
+  const { data, updateContact, saveNow } = useData()
   const { addToast } = useToast()
   const [form, setForm] = useState({ ...data.contact })
 
@@ -706,7 +714,11 @@ function AdminContact() {
     }))
   }
 
-  const handleSave = () => { updateContact(form); addToast('Kontak berhasil diperbarui', 'success') }
+  const handleSave = () => {
+    updateContact(form)
+    saveNow({ ...data, contact: { ...data.contact, ...form } })
+    addToast('Kontak berhasil diperbarui', 'success')
+  }
 
   return (
     <div className="max-w-2xl space-y-6">

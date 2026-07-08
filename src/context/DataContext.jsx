@@ -28,6 +28,8 @@ export function DataProvider({ children }) {
   const [loading, setLoading] = useState(true)
   const saveTimer = useRef(null)
   const initialized = useRef(false)
+  const dataRef = useRef(data)
+  dataRef.current = data
 
   useEffect(() => {
     if (initialized.current) return
@@ -60,7 +62,7 @@ export function DataProvider({ children }) {
         const res = await fetch(API_ENDPOINT, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data),
+          body: JSON.stringify(dataRef.current),
         })
         if (res.ok) {
           if (saveError) setSaveError(null)
@@ -158,7 +160,7 @@ export function DataProvider({ children }) {
 
   const saveNow = useCallback(async (customData) => {
     if (saveTimer.current) clearTimeout(saveTimer.current)
-    const body = customData !== undefined ? customData : data
+    const body = customData !== undefined ? customData : dataRef.current
     try {
       const res = await fetch(API_ENDPOINT, {
         method: 'POST',
@@ -178,7 +180,7 @@ export function DataProvider({ children }) {
       setSaveError('Server tidak tersedia. Data disimpan di browser saja.')
       return false
     }
-  }, [data])
+  }, [])
 
   return (
     <DataContext.Provider value={{
