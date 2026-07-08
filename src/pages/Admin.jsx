@@ -288,10 +288,8 @@ function AdminHero() {
           </div>
         </div>
         <div>
-          <label className={labelClass}>Foto Sales (PNG)</label>
-          <div className="flex gap-2">
-            <input type="text" value={form.salesPhoto || data.profile?.photo || ''} onChange={e => setForm({ ...form, salesPhoto: e.target.value })} className={inputClass} placeholder="URL foto sales (kosongkan untuk pakai foto profil)" />
-          </div>
+          <label className={labelClass}>Foto Sales</label>
+          <ImageFieldInput value={form.salesPhoto || ''} onChange={val => setForm({ ...form, salesPhoto: val })} />
           <p className="text-xs text-gray-400 mt-1">Kosongkan untuk menggunakan foto dari Profil Sales</p>
         </div>
         <div>
