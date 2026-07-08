@@ -100,15 +100,15 @@ export default function Footer() {
             <ul className="space-y-3 text-gray-400 text-sm">
               <li className="flex justify-between">
                 <span>Senin - Jumat</span>
-                <span>08:00 - 20:00</span>
+                <span>{contact.hours?.weekday || '08:00 - 20:00'}</span>
               </li>
               <li className="flex justify-between">
                 <span>Sabtu</span>
-                <span>08:00 - 18:00</span>
+                <span>{contact.hours?.saturday || '08:00 - 18:00'}</span>
               </li>
               <li className="flex justify-between">
                 <span>Minggu</span>
-                <span>09:00 - 16:00</span>
+                <span>{contact.hours?.sunday || '09:00 - 16:00'}</span>
               </li>
             </ul>
           </div>

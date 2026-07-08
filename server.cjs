@@ -158,6 +158,7 @@ async function initDatabase() {
       email TEXT DEFAULT '',
       address TEXT DEFAULT '',
       map_url TEXT DEFAULT '',
+      hours_json TEXT DEFAULT '{}',
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
 
@@ -184,6 +185,7 @@ async function initDatabase() {
       features_json LONGTEXT DEFAULT '[]',
       colors_json LONGTEXT DEFAULT '[]',
       price VARCHAR(100) DEFAULT '',
+      theme_json TEXT DEFAULT '{}',
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
@@ -285,7 +287,7 @@ async function readData() {
   const [contact] = await pool.query('SELECT * FROM contact WHERE id = 1')
   const [socialMedia] = await pool.query('SELECT platform, url, icon FROM contact_social_media WHERE contact_id = 1 ORDER BY sort_order')
 
-  const [products] = await pool.query('SELECT id, name, tagline, type, engine, fuel, image, description, specs_json, features_json, colors_json, price FROM products ORDER BY id')
+  const [products] = await pool.query('SELECT id, name, tagline, type, engine, fuel, image, description, specs_json, features_json, colors_json, price, theme_json FROM products ORDER BY id')
   const productsWithVariants = []
   for (const p of products) {
     const [variants] = await pool.query('SELECT name, price FROM product_variants WHERE product_id = ? ORDER BY sort_order', [p.id])
@@ -304,6 +306,7 @@ async function readData() {
       features: JSON.parse(p.features_json || '[]'),
       colors: JSON.parse(p.colors_json || '[]'),
       price: p.price,
+      theme: JSON.parse(p.theme_json || '{}'),
       variants
     })
   }
@@ -351,6 +354,7 @@ async function readData() {
       email: contact[0]?.email || '',
       address: contact[0]?.address || '',
       mapUrl: contact[0]?.map_url || '',
+      hours: JSON.parse(contact[0]?.hours_json || '{}'),
       socialMedia
     },
     products: productsWithVariants,
@@ -457,8 +461,8 @@ async function writeData(data) {
     if (data.contact) {
       const c = data.contact
       await conn.query(
-        'UPDATE contact SET phone = ?, email = ?, address = ?, map_url = ? WHERE id = 1',
-        [c.phone || '', c.email || '', c.address || '', c.mapUrl || '']
+        'UPDATE contact SET phone = ?, email = ?, address = ?, map_url = ?, hours_json = ? WHERE id = 1',
+        [c.phone || '', c.email || '', c.address || '', c.mapUrl || '', JSON.stringify(c.hours || {})]
       )
       if (c.socialMedia) {
         await conn.query('DELETE FROM contact_social_media WHERE contact_id = 1')
@@ -488,10 +492,10 @@ async function writeData(data) {
         if (existing && existing[0]) {
           await conn.query(
             `UPDATE products SET name = ?, tagline = ?, type = ?, engine = ?, fuel = ?, image = ?, description = ?,
-             specs_json = ?, features_json = ?, colors_json = ?, price = ? WHERE id = ?`,
+             specs_json = ?, features_json = ?, colors_json = ?, price = ?, theme_json = ? WHERE id = ?`,
             [p.name || '', p.tagline || '', p.type || '', p.engine || '', p.fuel || '', p.image || '',
              p.description || '', JSON.stringify(p.specs || {}), JSON.stringify(p.features || []),
-             JSON.stringify(p.colors || []), p.price || '', existing[0].id]
+             JSON.stringify(p.colors || []), p.price || '', JSON.stringify(p.theme || {}), existing[0].id]
           )
           // Replace variants
           await conn.query('DELETE FROM product_variants WHERE product_id = ?', [existing[0].id])
@@ -511,11 +515,11 @@ async function writeData(data) {
           }
         } else {
           const [result] = await conn.query(
-            `INSERT INTO products (name, tagline, type, engine, fuel, image, description, specs_json, features_json, colors_json, price)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            `INSERT INTO products (name, tagline, type, engine, fuel, image, description, specs_json, features_json, colors_json, price, theme_json)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [p.name || '', p.tagline || '', p.type || '', p.engine || '', p.fuel || '', p.image || '',
              p.description || '', JSON.stringify(p.specs || {}), JSON.stringify(p.features || []),
-             JSON.stringify(p.colors || []), p.price || '']
+             JSON.stringify(p.colors || []), p.price || '', JSON.stringify(p.theme || {})]
           )
           if (p.variants) {
             for (let i = 0; i < p.variants.length; i++) {

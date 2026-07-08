@@ -35,6 +35,7 @@ const produkConfig = {
     { key: 'specs', label: 'Spesifikasi', type: 'kv' },
     { key: 'colors', label: 'Warna Tersedia', type: 'colors' },
     { key: 'features', label: 'Fitur Unggulan', type: 'list' },
+    { key: 'theme', label: 'Tema Tampilan', type: 'theme' },
   ],
 }
 
@@ -734,6 +735,27 @@ function AdminContact() {
           <div>
             <label className={labelClass}>Alamat</label>
             <input type="text" value={form.address || ''} onChange={e => updateField('address', e.target.value)} placeholder="Jakarta Selatan, Indonesia" className={inputClass} />
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h3 className="font-poppins font-semibold text-gray-900 dark:text-white text-lg mb-4">Jam Operasional</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label className={labelClass}>Senin - Jumat</label>
+            <input type="text" value={form.hours?.weekday || ''} onChange={e => updateField('hours', { ...form.hours, weekday: e.target.value })}
+              placeholder="08:00 - 20:00" className={inputClass} />
+          </div>
+          <div>
+            <label className={labelClass}>Sabtu</label>
+            <input type="text" value={form.hours?.saturday || ''} onChange={e => updateField('hours', { ...form.hours, saturday: e.target.value })}
+              placeholder="08:00 - 18:00" className={inputClass} />
+          </div>
+          <div>
+            <label className={labelClass}>Minggu</label>
+            <input type="text" value={form.hours?.sunday || ''} onChange={e => updateField('hours', { ...form.hours, sunday: e.target.value })}
+              placeholder="09:00 - 16:00" className={inputClass} />
           </div>
         </div>
       </div>

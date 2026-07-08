@@ -5,10 +5,6 @@ import {
   FiArrowLeft, FiCheck, FiChevronLeft, FiChevronRight,
   FiCpu, FiZap, FiActivity, FiRepeat,
   FiStar, FiX, FiHeadphones,
-  FiMapPin, FiClock, FiTool, FiShieldOff,
-  FiCompass, FiSunrise, FiWind, FiAward,
-  FiMonitor, FiBattery, FiWifi, FiCamera,
-  FiGrid, FiUsers, FiLayers, FiShield,
 } from 'react-icons/fi'
 import { useData } from '../context/DataContext'
 import { getProductWhatsApp } from '../utils/whatsapp'
@@ -34,96 +30,7 @@ function formatSpecLabel(key) {
   return map[key] || key
 }
 
-const themes = {
-  brio: {
-    accent: '#A8D84A', badge: 'LCGC', heroGrad: 'from-gray-900 via-gray-800 to-black',
-    vibe: 'playful', heroSize: 'min-h-[80vh]',
-    whyTitle: 'Kenapa Pilih Brio?',
-    whyItems: [
-      { icon: FiMapPin, label: 'Mobil Kota', desc: 'Lincah di jalan perkotaan, parkir mudah' },
-      { icon: FiClock, label: 'Irit BBM', desc: '~20 km/l — hemat untuk harian' },
-      { icon: FiShieldOff, label: 'LCGC', desc: 'Pajak murah, perawatan terjangkau' },
-      { icon: FiTool, label: 'Perawatan Mudah', desc: 'Suku cadang melimpah & murah' },
-    ],
-  },
-  wrv: {
-    accent: '#E87A2A', badge: 'Mini SUV', heroGrad: 'from-amber-900 via-stone-800 to-black',
-    vibe: 'adventure', heroSize: 'min-h-[75vh]',
-    whyTitle: 'Petualang Sejati',
-    whyItems: [
-      { icon: FiCompass, label: 'Ground Clearance Tinggi', desc: 'Siap berbagai medan' },
-      { icon: FiSunrise, label: 'Desain Tangguh', desc: 'Tampilan SUV sejati' },
-      { icon: FiWind, label: 'Honda SENSING', desc: 'Keselamatan canggih' },
-      { icon: FiAward, label: 'Grid Connect', desc: 'Fitur konektivitas' },
-    ],
-  },
-  brv: {
-    accent: '#2DD4BF', badge: '7-Seater', heroGrad: 'from-teal-900 via-slate-800 to-black',
-    vibe: 'family', heroSize: 'min-h-[75vh]',
-    whyTitle: 'Keluarga Makin Nyaman',
-    whyItems: [
-      { icon: FiUsers, label: '7-Kursi Fleksibel', desc: 'Konfigurasi sesuai kebutuhan' },
-      { icon: FiShield, label: 'Honda SENSING', desc: 'Keselamatan keluarga' },
-      { icon: FiGrid, label: 'Kabin Luas', desc: 'Bagasi besar untuk perjalanan' },
-      { icon: FiLayers, label: 'Fitur Premium', desc: 'Smart Entry, Remote Engine Start' },
-    ],
-  },
-  city: {
-    accent: '#D4A855', badge: 'Hatchback Premium', heroGrad: 'from-zinc-900 via-zinc-800 to-black',
-    vibe: 'premium', heroSize: 'min-h-[75vh]',
-    whyTitle: 'Gaya Premium Fungsional',
-    whyItems: [
-      { icon: FiStar, label: 'Desain Mewah', desc: 'Tampilan premium elegan' },
-      { icon: FiMonitor, label: 'Honda SENSING', desc: 'CMBS, LKAS, ACC, RDM, AHB' },
-      { icon: FiLayers, label: 'ULTRA Seats', desc: '7 mode konfigurasi kabin' },
-      { icon: FiCamera, label: 'Kabin Fleksibel', desc: 'Muat barang besar dengan mudah' },
-    ],
-  },
-  hrv: {
-    accent: '#38BDF8', badge: 'Hybrid Crossover', heroGrad: 'from-blue-900 via-slate-800 to-black',
-    vibe: 'tech', heroSize: 'min-h-[75vh]',
-    whyTitle: 'Masa Depan Hybrid',
-    whyItems: [
-      { icon: FiBattery, label: 'e:HEV Hybrid', desc: '~25 km/l, responsif & irit' },
-      { icon: FiMonitor, label: 'Honda CONNECT', desc: 'Telematika terhubung' },
-      { icon: FiWifi, label: 'Panoramic Roof', desc: 'Kabin terang & lapang' },
-      { icon: FiZap, label: 'Power Tailgate', desc: 'Hands-free, praktis' },
-    ],
-  },
-  civic: {
-    accent: '#EF4444', badge: 'Performance Hybrid', heroGrad: 'from-red-900 via-neutral-900 to-black',
-    vibe: 'sport', heroSize: 'min-h-[75vh]',
-    whyTitle: 'Sport Hybrid Sejati',
-    whyItems: [
-      { icon: FiZap, label: '203 hp Combined', desc: 'Performa hybrid bertenaga' },
-      { icon: FiMonitor, label: 'Google Built-in', desc: 'Maps, Assistant, Play Store' },
-      { icon: FiStar, label: 'BOSE Audio', desc: '12-speaker premium' },
-      { icon: FiActivity, label: '4 Driving Modes', desc: 'Econ, Normal, Sport, Individual' },
-    ],
-  },
-  crv: {
-    accent: '#059669', badge: 'SUV Hybrid Premium', heroGrad: 'from-emerald-900 via-slate-800 to-black',
-    vibe: 'premium-family', heroSize: 'min-h-[75vh]',
-    whyTitle: 'SUV Keluarga Premium',
-    whyItems: [
-      { icon: FiUsers, label: 'Kabin Mewah', desc: 'Material premium, nyaman' },
-      { icon: FiShield, label: '360° Camera', desc: 'Multi-View Camera Assist' },
-      { icon: FiMonitor, label: 'Google Built-in', desc: '9-inch Display Audio' },
-      { icon: FiBattery, label: 'e:HEV Hybrid', desc: '~23 km/l, ramah lingkungan' },
-    ],
-  },
-  accord: {
-    accent: '#F59E0B', badge: 'Eksekutif Hybrid', heroGrad: 'from-gray-900 via-zinc-800 to-black',
-    vibe: 'executive', heroSize: 'min-h-[80vh]',
-    whyTitle: 'Kemewahan Eksekutif',
-    whyItems: [
-      { icon: FiAward, label: 'HUD 11,5"', desc: 'Head-Up Display terbesar' },
-      { icon: FiStar, label: 'BOSE 12-Speaker', desc: 'Audio premium kelas atas' },
-      { icon: FiMonitor, label: 'Google Built-in', desc: '12,3-inch Display Audio' },
-      { icon: FiShield, label: '8 Airbags', desc: 'Dual Knee + Side + Curtain' },
-    ],
-  },
-}
+const defaultTheme = { accent: '#E00000', badge: '', heroSize: 'min-h-[75vh]', heroGrad: 'from-gray-900 via-gray-800 to-black', whyTitle: '', whyItems: [] }
 
 function SpecBadge({ label, value, Icon, accent }) {
   return (
@@ -267,7 +174,7 @@ function ImageGallery({ images, onImageClick, accent }) {
 
 function HeroLayout({ product, keySpecs, theme }) {
   return (
-    <section className={`relative ${theme.heroSize} flex items-end bg-gradient-to-b ${theme.heroGrad} overflow-hidden`}>
+    <section className={`relative ${theme.heroSize || 'min-h-[75vh]'} flex items-end bg-gradient-to-b ${theme.heroGrad || 'from-gray-900 via-gray-800 to-black'} overflow-hidden`}>
       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-24">
         <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
@@ -401,10 +308,10 @@ function WhySection({ theme }) {
       style={{ borderColor: `${theme.accent}40`, backgroundColor: `${theme.accent}08` }}>
       <SectionTitle accent={theme.accent}>{theme.whyTitle}</SectionTitle>
       <div className="grid sm:grid-cols-2 gap-4">
-        {theme.whyItems.map(({ icon: Icon, label, desc }, i) => (
+        {theme.whyItems.map(({ label, desc }, i) => (
           <div key={i} className="flex items-start gap-3">
             <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" style={{ backgroundColor: `${theme.accent}20` }}>
-              <Icon size={16} style={{ color: theme.accent }} />
+              <FiStar size={16} style={{ color: theme.accent }} />
             </div>
             <div>
               <div className="text-sm font-semibold text-gray-900 dark:text-white">{label}</div>
@@ -829,8 +736,9 @@ export default function ProductDetail() {
   const keySpecs = keySpecKeys.map((k) => ({ key: k, label: formatSpecLabel(k), value: specs[k], Icon: specIcons[k] })).filter((s) => s.value)
   const detailSpecs = Object.entries(specs).filter(([k]) => !keySpecKeys.includes(k))
 
-  const theme = themes[id]
-  if (theme) {
+  const theme = product.theme
+  const hasTheme = theme?.accent
+  if (hasTheme) {
     return renderCustomLayout(product, images, specs, features, colors, keySpecs, detailSpecs, slideIndex, setSlideIndex, lightboxIndex, handleLightbox, related, theme)
   }
 

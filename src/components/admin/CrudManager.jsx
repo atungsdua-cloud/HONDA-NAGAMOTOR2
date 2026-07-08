@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { FiPlus, FiEdit2, FiTrash2, FiX, FiCheck, FiAlertCircle, FiImage, FiCheckSquare, FiSquare, FiLoader } from 'react-icons/fi'
+import { FiPlus, FiEdit2, FiTrash2, FiX, FiCheck, FiAlertCircle, FiImage, FiCheckSquare, FiSquare, FiLoader, FiStar } from 'react-icons/fi'
 import { useData } from '../../context/DataContext'
 import { useToast } from '../../context/ToastContext'
 import ImageFieldInput from '../ui/ImageFieldInput'
@@ -143,6 +143,75 @@ function FieldInput({ field, value, onChange, autoFocus }) {
       </div>
     )
   }
+  if (field.type === 'theme') {
+    const theme = value || {}
+    return (
+      <div className="space-y-3 p-3 bg-gray-50 dark:bg-gray-700/30 rounded-xl border border-gray-200 dark:border-gray-600">
+        <div className="flex items-center gap-2 text-xs font-medium text-gray-500"><FiStar size={14} /> Tema Tampilan</div>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-[11px] text-gray-400">Warna Aksen</label>
+            <div className="flex items-center gap-1.5">
+              <input type="color" value={theme.accent || '#e00000'} onChange={e => onChange({ ...theme, accent: e.target.value })}
+                className="w-9 h-9 rounded cursor-pointer border-0 bg-transparent" />
+              <input type="text" value={theme.accent || '#e00000'} onChange={e => onChange({ ...theme, accent: e.target.value })}
+                className="w-24 px-2 py-1.5 rounded-lg border bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-xs font-mono outline-none focus:ring-2 focus:ring-honda-red" />
+            </div>
+          </div>
+          <div>
+            <label className="text-[11px] text-gray-400">Badge</label>
+            <input type="text" value={theme.badge || ''} onChange={e => onChange({ ...theme, badge: e.target.value })}
+              placeholder="cth: LCGC / SUV"
+              className="w-full px-2 py-1.5 rounded-lg border bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-xs outline-none focus:ring-2 focus:ring-honda-red" />
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-[11px] text-gray-400">Gradient Hero (Tailwind)</label>
+            <input type="text" value={theme.heroGrad || ''} onChange={e => onChange({ ...theme, heroGrad: e.target.value })}
+              placeholder="from-gray-900 via-gray-800 to-black"
+              className="w-full px-2 py-1.5 rounded-lg border bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-xs font-mono outline-none focus:ring-2 focus:ring-honda-red" />
+          </div>
+          <div>
+            <label className="text-[11px] text-gray-400">Tinggi Hero (Tailwind)</label>
+            <input type="text" value={theme.heroSize || ''} onChange={e => onChange({ ...theme, heroSize: e.target.value })}
+              placeholder="min-h-[75vh]"
+              className="w-full px-2 py-1.5 rounded-lg border bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-xs font-mono outline-none focus:ring-2 focus:ring-honda-red" />
+          </div>
+        </div>
+        <div>
+          <label className="text-[11px] text-gray-400">Judul "Kenapa Pilih"</label>
+          <input type="text" value={theme.whyTitle || ''} onChange={e => onChange({ ...theme, whyTitle: e.target.value })}
+            placeholder="cth: Kenapa Pilih Brio?"
+            className="w-full px-2 py-1.5 rounded-lg border bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-xs outline-none focus:ring-2 focus:ring-honda-red" />
+        </div>
+        <div>
+          <label className="text-[11px] text-gray-400">Poin Keunggulan (label + deskripsi)</label>
+          <div className="space-y-1.5 mt-1">
+            {(theme.whyItems || []).map((item, i) => (
+              <div key={i} className="flex gap-1">
+                <input type="text" value={item.label || ''} onChange={e => {
+                  const n = [...(theme.whyItems || [])]
+                  n[i] = { ...n[i], label: e.target.value }
+                  onChange({ ...theme, whyItems: n })
+                }} placeholder="Label" className="w-2/5 px-2 py-1 rounded-lg border bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-xs outline-none focus:ring-2 focus:ring-honda-red" />
+                <input type="text" value={item.desc || ''} onChange={e => {
+                  const n = [...(theme.whyItems || [])]
+                  n[i] = { ...n[i], desc: e.target.value }
+                  onChange({ ...theme, whyItems: n })
+                }} placeholder="Deskripsi" className="flex-1 px-2 py-1 rounded-lg border bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-xs outline-none focus:ring-2 focus:ring-honda-red" />
+                <button onClick={() => onChange({ ...theme, whyItems: theme.whyItems.filter((_, idx) => idx !== i) })}
+                  className="text-red-400 hover:text-red-600 px-1"><FiX size={13} /></button>
+              </div>
+            ))}
+            <button onClick={() => onChange({ ...theme, whyItems: [...(theme.whyItems || []), { label: '', desc: '' }] })}
+              className="text-[11px] text-honda-red hover:underline flex items-center gap-1"><FiPlus size={12} /> Tambah Poin</button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   if (field.type === 'variants') {
     const items = Array.isArray(value) ? value : []
     const addItem = () => onChange([...items, { name: '', price: '' }])
