@@ -65,7 +65,9 @@ export function DataProvider({ children }) {
         if (res.ok) {
           if (saveError) setSaveError(null)
         } else {
-          setSaveError('Gagal menyimpan ke server.')
+          const errBody = await res.json().catch(() => ({}))
+          console.error('Save error:', res.status, errBody)
+          setSaveError(errBody.error || `Gagal menyimpan ke server (HTTP ${res.status})`)
         }
       } catch {
         setSaveError('Server tidak tersedia. Data disimpan di browser saja.')

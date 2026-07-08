@@ -17,14 +17,9 @@ $dbPass = getenv('DB_PASSWORD') ?: 'Nmtsikur123';
 $dbName = getenv('DB_NAME') ?: 'u686012864_honda_lombok';
 $dbPort = getenv('DB_PORT') ?: '3306';
 
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 $conn = new mysqli($dbHost, $dbUser, $dbPass, $dbName, (int)$dbPort);
 $conn->set_charset('utf8mb4');
-
-if ($conn->connect_error) {
-    http_response_code(500);
-    echo json_encode(['error' => 'Koneksi database gagal: ' . $conn->connect_error]);
-    exit;
-}
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     echo json_encode(readData($conn));
@@ -41,9 +36,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         writeData($conn, $body);
         echo json_encode(['success' => true]);
-    } catch (Exception $e) {
+    } catch (\Throwable $e) {
         http_response_code(500);
-        echo json_encode(['error' => $e->getMessage()]);
+        error_log('[HONDA API ERROR] ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+        echo json_encode(['error' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
     }
     exit;
 }
@@ -448,7 +444,7 @@ function writeData($conn, $data) {
         }
 
         $conn->commit();
-    } catch (Exception $e) {
+    } catch (\Throwable $e) {
         $conn->rollback();
         throw $e;
     }

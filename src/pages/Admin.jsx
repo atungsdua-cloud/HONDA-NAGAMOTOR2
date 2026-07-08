@@ -560,9 +560,9 @@ function AdminGaleri() {
 function AdminNavbar() {
   const { data, updateNavbar } = useData()
   const { addToast } = useToast()
-  const [form, setForm] = useState({ menuItems: [], ...data.navbar, loading: { ...data.loading } })
+  const [form, setForm] = useState({ menuItems: [], ...data.navbar, loading: { ...data.loadingScreen } })
 
-  useEffect(() => { setForm({ menuItems: [], ...data.navbar, loading: { ...data.loading } }) }, [data.navbar, data.loading])
+  useEffect(() => { setForm({ menuItems: [], ...data.navbar, loading: { ...data.loadingScreen } }) }, [data.navbar, data.loadingScreen])
 
   const handleSave = () => {
     const { menuItems, logoImage, logoText, logoSubtext, ctaText, ctaUrl, loading } = form
