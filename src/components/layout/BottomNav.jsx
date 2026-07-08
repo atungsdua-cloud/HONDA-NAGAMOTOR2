@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { FiHome, FiGrid, FiTag, FiStar, FiPhone } from 'react-icons/fi'
 import { useData } from '../../context/DataContext'
@@ -17,6 +17,7 @@ export default function BottomNav() {
   const { navbar } = data
   const menuItems = navbar?.menuItems || []
   const location = useLocation()
+  const navigate = useNavigate()
   const [activeSection, setActiveSection] = useState('')
 
   const isHome = location.pathname === '/'
@@ -51,8 +52,10 @@ export default function BottomNav() {
     const el = document.getElementById(section)
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' })
+    } else {
+      navigate(`/#${section}`)
     }
-  }, [])
+  }, [navigate])
 
   useEffect(() => {
     if (!isHome) return
@@ -90,8 +93,6 @@ export default function BottomNav() {
       window.removeEventListener('scroll', handleScroll)
     }
   }, [isHome, tabs])
-
-  if (!isHome) return null
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 lg:hidden">

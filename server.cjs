@@ -52,6 +52,22 @@ app.post('/api/data', async (req, res) => {
   }
 })
 
+app.post('/api/contact', async (req, res) => {
+  const { name, phone, product, message } = req.body
+  if (!name || !phone)
+    return res.status(400).json({ error: 'Nama dan nomor HP wajib diisi' })
+  try {
+    await pool.query(
+      'INSERT INTO contact_leads (name, phone, product, message) VALUES (?, ?, ?, ?)',
+      [name.trim(), phone.trim(), (product || '').trim(), (message || '').trim()]
+    )
+    res.json({ success: true })
+  } catch (e) {
+    console.error('Gagal simpan lead:', e.message)
+    res.status(500).json({ error: e.message })
+  }
+})
+
 app.use(express.static(join(__dirname, 'dist')))
 
 app.get('*', (req, res) => {
@@ -232,6 +248,15 @@ async function initDatabase() {
       title VARCHAR(200) NOT NULL,
       description TEXT DEFAULT '',
       sort_order INT NOT NULL DEFAULT 0,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
+
+    `CREATE TABLE IF NOT EXISTS contact_leads (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      name VARCHAR(200) NOT NULL,
+      phone VARCHAR(50) NOT NULL,
+      product VARCHAR(200) DEFAULT '',
+      message TEXT DEFAULT '',
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
   ]

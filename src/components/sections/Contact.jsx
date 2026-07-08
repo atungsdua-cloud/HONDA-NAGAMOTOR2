@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { FiSend, FiPhone, FiMail, FiMapPin } from 'react-icons/fi'
+import { FiSend, FiCheck, FiPhone, FiMail, FiMapPin } from 'react-icons/fi'
 import { FaInstagram, FaFacebook, FaTiktok } from 'react-icons/fa'
 import { useData } from '../../context/DataContext'
 import SectionTitle from '../ui/SectionTitle'
@@ -13,11 +13,27 @@ export default function Contact() {
   const products = data.products || []
   const contact = data.contact || {}
   const [form, setForm] = useState({ name: '', phone: '', product: '', message: '' })
+  const [sending, setSending] = useState(false)
+  const [sent, setSent] = useState(false)
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
+    setSending(true)
+    try {
+      await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form)
+      })
+      setSent(true)
+      setForm({ name: '', phone: '', product: '', message: '' })
+      setTimeout(() => setSent(false), 5000)
+    } catch {
+      // tetap buka WhatsApp walau simpan gagal
+    }
     const text = `Hallo Kak, saya ${form.name} (${form.phone}), tertarik dengan ${form.product || 'mobil Honda'}. ${form.message ? `Pesan: ${form.message}` : ''}`
     window.open(getWhatsAppLink(text), '_blank')
+    setSending(false)
   }
 
   return (
@@ -89,12 +105,16 @@ export default function Contact() {
 
             <motion.button
               type="submit"
+              disabled={sending}
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.99 }}
-              className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-honda-red text-white rounded-xl font-semibold text-sm hover:bg-red-700 transition-colors shadow-lg shadow-honda-red/30"
+              className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-honda-red text-white rounded-xl font-semibold text-sm hover:bg-red-700 transition-colors shadow-lg shadow-honda-red/30 disabled:opacity-70"
             >
-              <FiSend size={16} />
-              Kirim Pesan via WhatsApp
+              {sent ? (
+                <><FiCheck size={16} /> Data Terkirim</>
+              ) : (
+                <><FiSend size={16} /> Kirim Pesan via WhatsApp</>
+              )}
             </motion.button>
           </motion.form>
 

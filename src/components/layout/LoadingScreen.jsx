@@ -6,23 +6,10 @@ export default function LoadingScreen() {
   const { data, loading: dataLoading } = useData()
   const screen = data.loading || {}
   const [isLoading, setIsLoading] = useState(true)
-  const dataReady = useRef(false)
-  const minElapsed = useRef(false)
 
   useEffect(() => {
-    if (!dataLoading) {
-      dataReady.current = true
-      if (minElapsed.current) setIsLoading(false)
-    }
+    if (!dataLoading) setIsLoading(false)
   }, [dataLoading])
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      minElapsed.current = true
-      if (dataReady.current) setIsLoading(false)
-    }, 800)
-    return () => clearTimeout(timer)
-  }, [])
 
   return (
     <AnimatePresence>

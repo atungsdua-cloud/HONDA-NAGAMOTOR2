@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { FiClock } from 'react-icons/fi'
 import { useData } from '../../context/DataContext'
 import SectionTitle from '../ui/SectionTitle'
+import { getWhatsAppLink } from '../../utils/whatsapp'
 
 function CountdownTimer({ targetDate }) {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 })
@@ -34,6 +35,7 @@ function CountdownTimer({ targetDate }) {
 export default function Promo() {
   const { data } = useData()
   const promotions = data.promotions || []
+  const contactPhone = data.contact?.phone?.replace(/\D/g, '')
   return (
     <section id="promo" className="py-14 lg:py-28 bg-dark text-white relative overflow-hidden">
       <div className="absolute inset-0 bg-grid opacity-10 parallax hidden lg:block" />
@@ -81,7 +83,7 @@ export default function Promo() {
                 <div className="flex items-center justify-between">
                   <CountdownTimer targetDate={promo.validUntil} />
                   <motion.a
-                    href="https://wa.me/6281234567890"
+                    href={getWhatsAppLink(`Hallo Kak, saya tertarik dengan promo ${promo.title}`, contactPhone)}
                     target="_blank"
                     rel="noopener noreferrer"
                     whileHover={{ scale: 1.05 }}

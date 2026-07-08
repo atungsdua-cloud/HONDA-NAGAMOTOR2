@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { HiMenu, HiX } from 'react-icons/hi'
 import { FiSun, FiMoon } from 'react-icons/fi'
@@ -29,6 +29,7 @@ export default function Navbar() {
   const [isDark, setIsDark] = useState(false)
   const { scrollY } = useScrollPosition()
   const location = useLocation()
+  const navigate = useNavigate()
 
   const toggleDark = () => {
     document.documentElement.classList.toggle('dark')
@@ -55,15 +56,16 @@ export default function Navbar() {
 
   const handleNavClick = (e, section) => {
     if (!section) {
-      if (location.pathname !== '/') {
-        window.location.href = '/'
-      }
+      if (location.pathname !== '/') navigate('/')
       return
     }
     e.preventDefault()
-    const href = `/#${section}`
     if (location.pathname !== '/') {
-      window.location.href = href
+      navigate('/')
+      setTimeout(() => {
+        const el = document.getElementById(section)
+        if (el) el.scrollIntoView({ behavior: 'smooth' })
+      }, 100)
       return
     }
     const el = document.getElementById(section)
