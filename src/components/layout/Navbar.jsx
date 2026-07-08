@@ -10,7 +10,14 @@ import { useData } from '../../context/DataContext'
 export default function Navbar() {
   const { data } = useData()
   const { navbar } = data
-  const menuItems = navbar?.menuItems || []
+  const defaultMenu = [
+    { label: 'Beranda', section: '' },
+    { label: 'Produk', section: 'produk' },
+    { label: 'Promo', section: 'promo' },
+    { label: 'Testimoni', section: 'testimoni' },
+    { label: 'Kontak', section: 'kontak' },
+  ]
+  const menuItems = navbar?.menuItems?.length ? navbar.menuItems : defaultMenu
   const logoImage = navbar?.logoImage || ''
   const logoText = navbar?.logoText === '' ? '' : (navbar?.logoText || 'HONDA')
   const logoSubtext = navbar?.logoSubtext === '' ? '' : (navbar?.logoSubtext || 'Nagamotor')
