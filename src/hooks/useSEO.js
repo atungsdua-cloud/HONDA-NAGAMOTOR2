@@ -1,10 +1,16 @@
 import { useEffect } from 'react'
+import { useData } from '../context/DataContext'
 
 export default function useSEO({ title, description, image, url } = {}) {
+  const { data } = useData()
+
   useEffect(() => {
-    const siteName = 'Honda Nagamotor'
-    const defaultDesc = 'Dealer Resmi Honda. Temukan mobil impian Anda dengan promo terbaik.'
-    const defaultImage = 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=1200&q=80'
+    const brand = data?.navbar?.logoText || 'HONDA'
+    const tagline = data?.navbar?.logoSubtext || 'Nagamotor'
+    const siteName = `${brand} ${tagline}`
+    const defaultDesc = data?.hero?.subtitle || data?.profile?.description || 'Dealer Resmi Honda'
+    const defaultImage = data?.hero?.images?.[0] || data?.profile?.photo ||
+      'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=1200&q=80'
 
     const pageTitle = title ? `${title} | ${siteName}` : siteName
     const pageDesc = description || defaultDesc
@@ -34,5 +40,5 @@ export default function useSEO({ title, description, image, url } = {}) {
     setMeta('twitter:title', pageTitle)
     setMeta('twitter:description', pageDesc)
     setMeta('twitter:image', pageImage)
-  }, [title, description, image, url])
+  }, [title, description, image, url, data])
 }

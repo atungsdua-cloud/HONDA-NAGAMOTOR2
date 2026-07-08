@@ -4,21 +4,22 @@ import { FiMapPin, FiPhone, FiMail, FiInstagram, FiFacebook, FiTwitter } from 'r
 import { FaTiktok } from 'react-icons/fa'
 import { useData } from '../../context/DataContext'
 
-const quickLinks = [
-  { label: 'Beranda', href: '/' },
-  { label: 'Produk', href: '/#produk' },
-  { label: 'Promo', href: '/#promo' },
-  { label: 'Testimoni', href: '/#testimoni' },
-]
-
 export default function Footer() {
   const { data } = useData()
+  const navbar = data.navbar || {}
   const contact = data.contact || {}
   const profile = data.profile || {}
   const socialMedia = contact.socialMedia || profile.socialMedia || []
   const phone = contact.phone || profile.phone || '+62 812 3456 7890'
   const email = contact.email || profile.email || 'sales@hondanagamotor.com'
   const address = contact.address || profile.address || 'Jl. Raya Contoh No. 123, Jakarta Selatan'
+  const navbarText = `${navbar.logoText || 'HONDA'} ${navbar.logoSubtext || 'Nagamotor'}`
+
+  const menuItems = navbar.menuItems || []
+  const quickLinks = [
+    { label: 'Beranda', href: '/' },
+    ...menuItems.map(m => ({ label: m.label, href: `/#${m.section}` })),
+  ]
 
   const getSocialUrl = (platform) => {
     const found = socialMedia.find(s => s.platform === platform)
@@ -33,13 +34,12 @@ export default function Footer() {
           <div className="space-y-5">
             <div className="flex items-center gap-2">
               <svg viewBox="0 0 100 30" className="h-8 w-auto" fill="#fff">
-                <text x="0" y="22" fontFamily="Poppins" fontWeight="800" fontSize="20" letterSpacing="2">HONDA</text>
+                <text x="0" y="22" fontFamily="Poppins" fontWeight="800" fontSize="20" letterSpacing="2">{navbar.logoText || 'HONDA'}</text>
               </svg>
-              <span className="text-xs tracking-widest uppercase opacity-50">Nagamotor</span>
+              <span className="text-xs tracking-widest uppercase opacity-50">{navbar.logoSubtext || 'Nagamotor'}</span>
             </div>
             <p className="text-gray-400 text-sm leading-relaxed">
-              Dealer Resmi Honda. Melayani penjualan mobil baru dan konsultasi. 
-              Kepuasan pelanggan adalah prioritas utama kami.
+              {profile.description || 'Dealer Resmi Honda. Melayani penjualan mobil baru dan konsultasi.'}
             </p>
             <div className="flex gap-3">
               {[
@@ -116,7 +116,7 @@ export default function Footer() {
 
         <div className="mt-12 pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-gray-500 text-xs">
-            &copy; {new Date().getFullYear()} Honda Nagamotor. All rights reserved.
+            &copy; {new Date().getFullYear()} {navbarText}. All rights reserved.
           </p>
           <div className="flex gap-6 text-xs text-gray-500">
             <a href="#" className="hover:text-honda-red transition-colors">Kebijakan Privasi</a>

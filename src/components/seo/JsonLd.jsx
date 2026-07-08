@@ -24,13 +24,14 @@ export function ProductJsonLd({ product }) {
 
 export function ReviewJsonLd({ testimonials }) {
   if (!testimonials?.length) return null
+  const avg = testimonials.reduce((s, t) => s + (t.rating || 5), 0) / testimonials.length
   const json = {
     '@context': 'https://schema.org',
     '@type': 'Review',
     itemReviewed: { '@type': 'Organization', name: 'Honda Nagamotor' },
     reviewRating: {
       '@type': 'AggregateRating',
-      ratingValue: '4.9',
+      ratingValue: avg.toFixed(1),
       bestRating: '5',
       reviewCount: testimonials.length,
     },
@@ -56,7 +57,11 @@ export function LocalBusinessJsonLd() {
   const { data } = useData()
   const contact = data.contact || {}
   const profile = data.profile || {}
+  const navbar = data.navbar || {}
   const socialMedia = contact.socialMedia || profile.socialMedia || []
+  const hero = data.hero || {}
+  const brand = navbar.logoText || 'HONDA'
+  const tagline = navbar.logoSubtext || 'Nagamotor'
   const getSocialUrl = (platform) => {
     const found = socialMedia.find(s => s.platform === platform)
     return found?.url || ''
@@ -64,15 +69,15 @@ export function LocalBusinessJsonLd() {
   const json = {
     '@context': 'https://schema.org',
     '@type': 'AutoDealer',
-    name: profile.namaPerusahaan || 'Honda Nagamotor',
-    description: 'Dealer Resmi Honda',
+    name: `${brand} ${tagline}`,
+    description: profile.description || hero.subtitle || 'Dealer Resmi Honda',
     url: window.location.origin,
-    telephone: contact.phone || profile.phone || '+6281234567890',
-    email: contact.email || profile.email || 'sales@hondanagamotor.com',
+    telephone: contact.phone || profile.phone || '',
+    email: contact.email || profile.email || '',
     address: {
       '@type': 'PostalAddress',
-      streetAddress: contact.address || profile.address || 'Jl. Raya Contoh No. 123',
-      addressLocality: contact.kota || profile.kota || 'Jakarta Selatan',
+      streetAddress: contact.address || profile.address || '',
+      addressLocality: '',
       addressCountry: 'ID',
     },
     sameAs: [getSocialUrl('instagram'), getSocialUrl('facebook'), getSocialUrl('twitter')].filter(Boolean),

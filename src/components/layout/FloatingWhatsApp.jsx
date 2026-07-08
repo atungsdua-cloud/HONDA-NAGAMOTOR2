@@ -1,8 +1,12 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useData } from '../../context/DataContext'
 import { getWhatsAppLink } from '../../utils/whatsapp'
 
 export default function FloatingWhatsApp() {
+  const { data } = useData()
+  const contact = data.contact || {}
+  const phone = contact.phone?.replace(/\D/g, '')
   const [showTooltip, setShowTooltip] = useState(false)
 
   return (
@@ -17,14 +21,14 @@ export default function FloatingWhatsApp() {
           >
             <div className="absolute -bottom-2 right-6 w-3 h-3 bg-white dark:bg-gray-800 rotate-45" />
             <p className="text-sm text-gray-700 dark:text-gray-300 font-medium">
-              Hallo Kak, saya tertarik dengan mobil Honda.
+              Hallo Kak, ada yang bisa saya bantu?
             </p>
           </motion.div>
         )}
       </AnimatePresence>
 
       <motion.a
-        href={getWhatsAppLink()}
+        href={getWhatsAppLink('Hallo Kak, saya tertarik dengan mobil Honda.', phone)}
         target="_blank"
         rel="noopener noreferrer"
         onMouseEnter={() => setShowTooltip(true)}
