@@ -45,8 +45,10 @@ app.post('/api/data', async (req, res) => {
     await writeData(body)
     res.json({ success: true })
   } catch (e) {
-    console.error('Gagal tulis database:', e.message)
-    res.status(500).json({ error: 'Gagal menyimpan data' })
+    console.error('=== ERROR WRITE DATABASE ===')
+    console.error('Message:', e.message)
+    console.error('Stack:', e.stack)
+    res.status(500).json({ error: e.message || 'Gagal menyimpan data' })
   }
 })
 
