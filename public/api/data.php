@@ -282,6 +282,22 @@ function writeData($conn, $data) {
         }
 
         if (isset($data['products'])) {
+            // Hapus produk yang ada di DB tapi tidak di data incoming
+            $existingIds = [];
+            $r = $conn->query("SELECT id FROM products");
+            while ($row = $r->fetch_assoc()) $existingIds[] = $row['id'];
+            $incomingIds = [];
+            foreach ($data['products'] as $p) {
+                if (isset($p['id'])) {
+                    $incomingIds[] = (int)str_replace('product-', '', $p['id']);
+                }
+            }
+            $toDelete = array_diff($existingIds, $incomingIds);
+            foreach ($toDelete as $did) {
+                $conn->query("DELETE FROM product_variants WHERE product_id = $did");
+                $conn->query("DELETE FROM product_images WHERE product_id = $did");
+                $conn->query("DELETE FROM products WHERE id = $did");
+            }
             foreach ($data['products'] as $p) {
                 $pid = null;
                 if (isset($p['id'])) {
@@ -299,6 +315,20 @@ function writeData($conn, $data) {
                         json_encode($p['specs'] ?? []), json_encode($p['features'] ?? []),
                         json_encode($p['colors'] ?? []), $p['price'] ?? '', $pid
                     ]);
+                    $conn->query("DELETE FROM product_variants WHERE product_id = $pid");
+                    if (isset($p['variants'])) {
+                        $vStmt = $conn->prepare("INSERT INTO product_variants (product_id, name, price, sort_order) VALUES (?, ?, ?, ?)");
+                        foreach ($p['variants'] as $vi => $v) {
+                            $vStmt->execute([$pid, $v['name'], $v['price'], $vi + 1]);
+                        }
+                    }
+                    $conn->query("DELETE FROM product_images WHERE product_id = $pid");
+                    if (isset($p['images'])) {
+                        $iStmt = $conn->prepare("INSERT INTO product_images (product_id, url, sort_order) VALUES (?, ?, ?)");
+                        foreach ($p['images'] as $ii => $url) {
+                            $iStmt->execute([$pid, $url, $ii + 1]);
+                        }
+                    }
                 } else {
                     $stmt = $conn->prepare("INSERT INTO products (name, tagline, type, engine, fuel, image, description, specs_json, features_json, colors_json, price) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                     $stmt->execute([
@@ -314,11 +344,28 @@ function writeData($conn, $data) {
                             $vStmt->execute([$newId, $v['name'], $v['price'], $vi + 1]);
                         }
                     }
+                    if (isset($p['images'])) {
+                        $iStmt = $conn->prepare("INSERT INTO product_images (product_id, url, sort_order) VALUES (?, ?, ?)");
+                        foreach ($p['images'] as $ii => $url) {
+                            $iStmt->execute([$newId, $url, $ii + 1]);
+                        }
+                    }
                 }
             }
         }
 
         if (isset($data['promotions'])) {
+            $existingIds = [];
+            $r = $conn->query("SELECT id FROM promotions");
+            while ($row = $r->fetch_assoc()) $existingIds[] = $row['id'];
+            $incomingIds = [];
+            foreach ($data['promotions'] as $p) {
+                if (isset($p['id'])) {
+                    $incomingIds[] = (int)str_replace('promotion-', '', $p['id']);
+                }
+            }
+            $toDelete = array_diff($existingIds, $incomingIds);
+            foreach ($toDelete as $did) $conn->query("DELETE FROM promotions WHERE id = $did");
             foreach ($data['promotions'] as $p) {
                 $pid = null;
                 if (isset($p['id'])) {
@@ -343,6 +390,17 @@ function writeData($conn, $data) {
         }
 
         if (isset($data['testimonials'])) {
+            $existingIds = [];
+            $r = $conn->query("SELECT id FROM testimonials");
+            while ($row = $r->fetch_assoc()) $existingIds[] = $row['id'];
+            $incomingIds = [];
+            foreach ($data['testimonials'] as $t) {
+                if (isset($t['id'])) {
+                    $incomingIds[] = (int)str_replace('testimonial-', '', $t['id']);
+                }
+            }
+            $toDelete = array_diff($existingIds, $incomingIds);
+            foreach ($toDelete as $did) $conn->query("DELETE FROM testimonials WHERE id = $did");
             foreach ($data['testimonials'] as $t) {
                 $tid = null;
                 if (isset($t['id'])) {
@@ -361,6 +419,17 @@ function writeData($conn, $data) {
         }
 
         if (isset($data['gallery'])) {
+            $existingIds = [];
+            $r = $conn->query("SELECT id FROM gallery");
+            while ($row = $r->fetch_assoc()) $existingIds[] = $row['id'];
+            $incomingIds = [];
+            foreach ($data['gallery'] as $g) {
+                if (isset($g['id'])) {
+                    $incomingIds[] = (int)str_replace('gallery-', '', $g['id']);
+                }
+            }
+            $toDelete = array_diff($existingIds, $incomingIds);
+            foreach ($toDelete as $did) $conn->query("DELETE FROM gallery WHERE id = $did");
             foreach ($data['gallery'] as $gi => $g) {
                 $gid = null;
                 if (isset($g['id'])) {
@@ -379,6 +448,17 @@ function writeData($conn, $data) {
         }
 
         if (isset($data['faqs'])) {
+            $existingIds = [];
+            $r = $conn->query("SELECT id FROM faqs");
+            while ($row = $r->fetch_assoc()) $existingIds[] = $row['id'];
+            $incomingIds = [];
+            foreach ($data['faqs'] as $f) {
+                if (isset($f['id'])) {
+                    $incomingIds[] = (int)str_replace('faq-', '', $f['id']);
+                }
+            }
+            $toDelete = array_diff($existingIds, $incomingIds);
+            foreach ($toDelete as $did) $conn->query("DELETE FROM faqs WHERE id = $did");
             foreach ($data['faqs'] as $fi => $f) {
                 $fid = null;
                 if (isset($f['id'])) {
@@ -397,6 +477,17 @@ function writeData($conn, $data) {
         }
 
         if (isset($data['advantages'])) {
+            $existingIds = [];
+            $r = $conn->query("SELECT id FROM advantages");
+            while ($row = $r->fetch_assoc()) $existingIds[] = $row['id'];
+            $incomingIds = [];
+            foreach ($data['advantages'] as $a) {
+                if (isset($a['id'])) {
+                    $incomingIds[] = (int)str_replace('advantage-', '', $a['id']);
+                }
+            }
+            $toDelete = array_diff($existingIds, $incomingIds);
+            foreach ($toDelete as $did) $conn->query("DELETE FROM advantages WHERE id = $did");
             foreach ($data['advantages'] as $ai => $a) {
                 $aid = null;
                 if (isset($a['id'])) {
