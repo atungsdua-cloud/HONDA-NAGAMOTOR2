@@ -1,20 +1,48 @@
-import { useEffect, useState, useRef } from 'react'
-import { motion, useInView } from 'framer-motion'
+import { useEffect, useState, useRef, useCallback } from 'react'
+import { motion, useInView, useScroll, useTransform, AnimatePresence } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { useData } from '../../context/DataContext'
 import { getWhatsAppLink } from '../../utils/whatsapp'
+
+function SlideIn({ children, delay = 0, className }) {
+  return (
+    <span className={`inline-block overflow-hidden ${className || ''}`}>
+      <motion.span
+        initial={{ y: 80, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.7, delay, ease: [0.25, 0.46, 0.45, 0.94] }}
+        className="inline-block"
+      >
+        {children}
+      </motion.span>
+    </span>
+  )
+}
 
 export default function Hero() {
   const { data } = useData()
   const heroData = data.hero || {}
   const profile = data.profile || {}
   const stats = heroData.stats || []
+  const title = heroData.title || 'Selamat Datang di Honda Nagamotor'
+  const subtitle = heroData.subtitle || 'Promo terbaik, DP ringan, proses cepat, dan pelayanan profesional.'
   const heroImages = heroData.images?.length ? heroData.images : [
     'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=1600&q=80',
     'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=1600&q=80',
     'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=1600&q=80',
   ]
+
   const [currentImage, setCurrentImage] = useState(0)
+  const [loaded, setLoaded] = useState(false)
+  const sectionRef = useRef(null)
+  const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 })
+
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start start', 'end start'],
+  })
+  const bgScale = useTransform(scrollYProgress, [0, 1], [1, 1.2])
+  const contentY = useTransform(scrollYProgress, [0, 1], [0, 100])
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -23,165 +51,267 @@ export default function Hero() {
     return () => clearInterval(interval)
   }, [heroImages.length])
 
-  const fadeUp = {
-    hidden: { opacity: 0, y: 40 },
-    visible: (i) => ({
-      opacity: 1, y: 0,
-      transition: { duration: 0.7, delay: i * 0.2, ease: 'easeOut' },
-    }),
-  }
+  useEffect(() => { setLoaded(true) }, [])
+
+  const handleMouseMove = useCallback((e) => {
+    if (!sectionRef.current) return
+    const rect = sectionRef.current.getBoundingClientRect()
+    setMousePos({
+      x: (e.clientX - rect.left) / rect.width,
+      y: (e.clientY - rect.top) / rect.height,
+    })
+  }, [])
+
+  const titleLines = title.split(' ').reduce((acc, word, i) => {
+    const last = acc[acc.length - 1]
+    if (!last || last.length >= 4 || word.length + last.join(' ').length > 18) {
+      acc.push([word])
+    } else {
+      last.push(word)
+    }
+    return acc
+  }, [])
 
   return (
-    <section className="relative min-h-[600px] sm:min-h-[700px] flex items-center overflow-hidden bg-gray-900">
-      {heroImages.map((img, i) => (
-        <div
-          key={i}
-          className={`absolute inset-0 transition-opacity duration-1000 ${i === currentImage ? 'opacity-100' : 'opacity-0'}`}
+    <section
+      ref={sectionRef}
+      onMouseMove={handleMouseMove}
+      className="relative min-h-dvh flex items-center overflow-hidden bg-gray-950"
+    >
+      {/* Animated gradient background */}
+      <motion.div
+        className="absolute inset-0 opacity-30"
+        style={{
+          background: `
+            radial-gradient(ellipse at ${mousePos.x * 100}% ${mousePos.y * 100}%, rgba(228,5,33,0.15) 0%, transparent 60%),
+            radial-gradient(ellipse at ${100 - mousePos.x * 100}% ${100 - mousePos.y * 100}%, rgba(59,130,246,0.08) 0%, transparent 50%)
+          `,
+          transition: 'background 0.8s ease-out',
+        }}
+      />
+
+      {/* Background slider */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={currentImage}
+          initial={{ opacity: 0, scale: 1.1 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 1.2, ease: 'easeInOut' }}
+          className="absolute inset-0"
         >
-          <img src={img} alt={`Honda ${i + 1}`} className="w-full h-full object-cover" onError={e => { e.target.style.display = 'none' }} />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-black/30" />
-        </div>
-      ))}
+          <motion.img
+            src={heroImages[currentImage]}
+            alt=""
+            className="w-full h-full object-cover"
+            style={{ scale: bgScale }}
+            onError={(e) => { e.target.style.display = 'none' }}
+          />
+        </motion.div>
+      </AnimatePresence>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-20">
-        <div className="flex flex-col lg:flex-row items-center lg:items-center gap-12 lg:gap-16">
-          <div className="flex-1 max-w-2xl">
-            <motion.span
-              custom={0}
-              variants={fadeUp}
-              initial="hidden"
-              animate="visible"
-              className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white text-sm font-medium mb-6"
-            >
-              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-              Dealer Resmi Honda Terpercaya
-            </motion.span>
+      {/* Overlay layers */}
+      <div className="absolute inset-0 bg-gradient-to-r from-gray-950/90 via-gray-950/70 to-gray-950/50" />
+      <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-transparent to-gray-950/20" />
+      <div className="absolute inset-0" style={{
+        background: `radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.4) 100%)`,
+      }} />
 
-            <motion.h1
-              custom={1}
-              variants={fadeUp}
-              initial="hidden"
-              animate="visible"
-              className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-poppins font-extrabold text-white leading-tight mb-6"
+      {/* Subtle grid */}
+      <div className="absolute inset-0 opacity-[0.03]" style={{
+        backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
+        backgroundSize: '60px 60px',
+      }} />
+
+      {/* Content */}
+      <motion.div
+        style={{ y: contentY }}
+        className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32"
+      >
+        <div className="flex flex-col lg:flex-row items-center lg:items-start gap-12 lg:gap-16">
+          <div className="flex-1 max-w-2xl pt-4 lg:pt-8">
+            {/* Badge */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={loaded ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, ease: 'easeOut' }}
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 backdrop-blur-sm border border-white/10 mb-8"
             >
-              {(heroData.title || 'Selamat Datang di Honda Nagamotor').split(' ').map((word, i) => (
-                <motion.span
-                  key={i}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.4 + i * 0.1 }}
-                  className="inline-block mr-[0.25em]"
-                >
-                  {word === 'Impian' || word === 'Aldi' ? (
-                    <span className={`${word === 'Impian' ? 'text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-orange-400' : 'text-honda-red'}`}>
-                      {word}
-                    </span>
-                  ) : (
-                    word
-                  )}
-                </motion.span>
+              <span className="w-1.5 h-1.5 rounded-full bg-honda-red shadow-[0_0_6px_rgba(228,5,33,0.6)]" />
+              <span className="text-white/70 text-xs tracking-widest uppercase font-medium">
+                Dealer Resmi Honda
+              </span>
+            </motion.div>
+
+            {/* Title with slide-up reveal */}
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-poppins font-black text-white leading-[1.15] mb-2">
+              {titleLines.map((line, i) => (
+                <div key={i} className="overflow-hidden mb-2">
+                  <motion.span
+                    initial={{ y: '100%' }}
+                    animate={loaded ? { y: 0 } : {}}
+                    transition={{ duration: 0.8, delay: 0.3 + i * 0.12, ease: [0.25, 0.46, 0.45, 0.94] }}
+                    className="inline-block"
+                  >
+                    {line.map((word, j) => (
+                      <span key={j} className="inline-block mr-[0.3em]">
+                        {word === 'Impian' || word === 'Aldi' ? (
+                          <span className={word === 'Impian'
+                            ? 'text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-orange-400'
+                            : 'text-honda-red'
+                          }>
+                            {word}
+                          </span>
+                        ) : (
+                          word
+                        )}
+                      </span>
+                    ))}
+                  </motion.span>
+                </div>
               ))}
-            </motion.h1>
+            </h1>
 
+            {/* Animated accent line */}
+            <motion.div
+              initial={{ scaleX: 0 }}
+              animate={loaded ? { scaleX: 1 } : {}}
+              transition={{ duration: 1, delay: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+              className="origin-left h-[3px] w-24 bg-gradient-to-r from-honda-red to-honda-red/20 rounded-full mb-6"
+            />
+
+            {/* Subtitle */}
             <motion.p
-              custom={2}
-              variants={fadeUp}
-              initial="hidden"
-              animate="visible"
-              className="text-lg sm:text-xl text-gray-300 mb-8 max-w-xl leading-relaxed"
+              initial={{ opacity: 0, y: 20 }}
+              animate={loaded ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, delay: 0.9, ease: 'easeOut' }}
+              className="text-base sm:text-lg text-white/60 max-w-xl leading-relaxed mb-8"
             >
-              {heroData.subtitle || 'Promo terbaik, DP ringan, proses cepat, dan pelayanan profesional.'}
+              {subtitle}
             </motion.p>
 
+            {/* Buttons */}
             <motion.div
-              custom={3}
-              variants={fadeUp}
-              initial="hidden"
-              animate="visible"
+              initial={{ opacity: 0, y: 20 }}
+              animate={loaded ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.6, delay: 1.1, ease: 'easeOut' }}
               className="flex flex-wrap gap-4"
             >
               <Link
                 to="/#promo"
-                className="px-8 py-3.5 bg-honda-red text-white rounded-full font-semibold text-sm sm:text-base hover:bg-red-700 transition-all duration-300 shadow-xl shadow-honda-red/30 hover:shadow-honda-red/50 hover:scale-105"
+                className="group relative px-7 py-3 bg-honda-red text-white rounded-full font-semibold text-sm sm:text-base transition-all duration-300 shadow-lg shadow-honda-red/25 hover:shadow-xl hover:shadow-honda-red/40 hover:scale-105 active:scale-95 overflow-hidden"
               >
-                Lihat Promo
+                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                <span className="relative z-10 flex items-center gap-2">
+                  Lihat Promo
+                  <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                </span>
               </Link>
               <motion.a
                 href={getWhatsAppLink()}
                 target="_blank"
                 rel="noopener noreferrer"
                 whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.98 }}
-                className="px-8 py-3.5 bg-white/10 backdrop-blur-md border border-white/30 text-white rounded-full font-semibold text-sm sm:text-base hover:bg-white/20 transition-all duration-300 flex items-center gap-2"
+                whileTap={{ scale: 0.95 }}
+                className="group relative px-7 py-3 bg-white/5 backdrop-blur-sm border border-white/20 text-white rounded-full font-semibold text-sm sm:text-base hover:bg-white/10 transition-all duration-300 flex items-center gap-2 overflow-hidden"
               >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-                Konsultasi WhatsApp
+                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                <svg className="w-5 h-5 relative z-10" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                <span className="relative z-10">Konsultasi</span>
               </motion.a>
             </motion.div>
 
-            <motion.div
-              custom={4}
-              variants={fadeUp}
-              initial="hidden"
-              animate="visible"
-              className="grid grid-cols-3 gap-3 sm:gap-8 mt-12 pt-8 border-t border-white/10"
-            >
-              {stats.map((stat, i) => (
-                <div key={stat.label} className="text-center lg:text-left">
-                  <div className="text-2xl sm:text-3xl lg:text-4xl font-poppins font-bold text-white">
-                    <AnimatedCounter value={stat.value} suffix={stat.suffix} />
-                  </div>
-                  <div className="text-xs sm:text-sm text-gray-400 mt-1">{stat.label}</div>
-                </div>
-              ))}
-            </motion.div>
-          </div>
-
-          <motion.div
-            initial={{ opacity: 0, x: 100 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.6, ease: 'easeOut' }}
-            className="flex-shrink-0 relative"
-          >
-            <div className="relative flex items-center justify-center p-8 sm:p-10">
-              <div className="absolute inset-0 bg-white/90 dark:bg-gray-800/90 rounded-3xl shadow-2xl border border-white/40" />
-
-              <motion.div
-                animate={{ y: [0, -12, 0] }}
-                transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-                className="relative z-10"
-              >
-                <img
-                  src={heroData.salesPhoto || profile.photo || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80'}
-                  alt={profile.name || 'Sales'}
-                  className="max-w-[250px] sm:max-w-[320px] lg:max-w-[400px] w-full h-auto drop-shadow-xl"
-                />
-              </motion.div>
-
-              <motion.div
-                animate={{
-                  scale: [1, 1.05, 1],
-                  opacity: [0.2, 0.4, 0.2],
-                }}
-                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-                className="absolute -inset-4 bg-gradient-to-r from-honda-red/20 via-purple-500/15 to-blue-500/20 blur-3xl -z-20"
-              />
-
+            {/* Stats */}
+            {stats.length > 0 && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 1.2 }}
-                className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-white/90 dark:bg-gray-800/90 backdrop-blur-xl border border-white/40 rounded-2xl px-6 py-3 text-center whitespace-nowrap shadow-xl"
+                animate={loaded ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.6, delay: 1.3, ease: 'easeOut' }}
+                className="flex flex-wrap gap-6 sm:gap-10 mt-12 pt-8 border-t border-white/10"
               >
-                <p className="text-gray-900 dark:text-white font-semibold text-sm">{profile.name}</p>
-                <p className="text-gray-500 dark:text-gray-300 text-xs">{profile.title}</p>
+                {stats.map((stat) => (
+                  <div key={stat.label} className="group">
+                    <div className="text-xl sm:text-2xl lg:text-3xl font-poppins font-bold text-white group-hover:text-honda-red transition-colors duration-300">
+                      <AnimatedCounter value={stat.value} suffix={stat.suffix} />
+                    </div>
+                    <div className="text-xs sm:text-sm text-white/40 mt-0.5 group-hover:text-white/60 transition-colors duration-300">{stat.label}</div>
+                  </div>
+                ))}
               </motion.div>
+            )}
+          </div>
+
+          {/* Sales card */}
+          <motion.div
+            initial={{ opacity: 0, x: 80, y: 30 }}
+            animate={loaded ? { opacity: 1, x: 0, y: 0 } : {}}
+            transition={{ duration: 0.8, delay: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="flex-shrink-0 relative w-full max-w-sm"
+          >
+            <div className="relative">
+              <div className="absolute -inset-4 bg-gradient-to-b from-honda-red/20 via-purple-500/10 to-transparent rounded-[2rem] blur-2xl" />
+              <div className="relative bg-white/[0.06] backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden shadow-2xl">
+                <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+
+                {/* Content */}
+                <div className="p-6 sm:p-8">
+                  <div className="flex flex-col items-center text-center">
+                    {/* Photo */}
+                    <div className="relative mb-5">
+                      <div className="absolute inset-0 bg-gradient-to-b from-honda-red/20 to-transparent rounded-full blur-xl" />
+                      <div className="rounded-full p-1 bg-white/10">
+                        <img
+                          src={heroData.salesPhoto || profile.photo || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80'}
+                          alt={profile.name || 'Sales'}
+                          className="w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover border-2 border-white/20 shadow-xl"
+                        />
+                      </div>
+                      <div className="absolute -bottom-0.5 -right-0.5 w-7 h-7 bg-green-500 rounded-full border-[3px] border-gray-950 shadow-lg flex items-center justify-center">
+                        <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                      </div>
+                    </div>
+
+                    {/* Name & title */}
+                    <h3 className="text-white font-semibold text-lg">{profile.name || 'Sales Honda'}</h3>
+                    <p className="text-white/50 text-sm mb-6">{profile.title || 'Sales Consultant'}</p>
+
+                    {/* CTA */}
+                    <motion.a
+                      href={getWhatsAppLink()}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      whileHover={{ scale: 1.03 }}
+                      whileTap={{ scale: 0.97 }}
+                      className="w-full inline-flex items-center justify-center gap-2.5 px-5 py-3 bg-honda-red text-white rounded-xl font-semibold text-sm hover:bg-red-600 transition-all shadow-lg shadow-honda-red/25 hover:shadow-xl hover:shadow-honda-red/30"
+                    >
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                      Hubungi via WhatsApp
+                    </motion.a>
+                  </div>
+                </div>
+              </div>
             </div>
           </motion.div>
         </div>
+      </motion.div>
+
+      {/* Slide indicators */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2">
+        {heroImages.map((_, i) => (
+          <motion.button
+            key={i}
+            onClick={() => setCurrentImage(i)}
+            className={`h-1 rounded-full transition-all duration-500 cursor-pointer ${
+              i === currentImage ? 'w-8 bg-honda-red' : 'w-2 bg-white/30 hover:bg-white/50'
+            }`}
+            whileHover={{ scale: 1.2 }}
+            whileTap={{ scale: 0.9 }}
+          />
+        ))}
       </div>
 
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-dark to-transparent" />
+      {/* Bottom fade */}
+      <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-gray-950 to-transparent z-10 pointer-events-none" />
     </section>
   )
 }
