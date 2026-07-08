@@ -284,7 +284,7 @@ function CardView({ item, config, onEdit, onDelete, selected, onToggle }) {
 }
 
 export default function CrudManager({ config }) {
-  const { data, add, update, remove } = useData()
+  const { data, add, update, remove, saveNow } = useData()
   const { addToast } = useToast()
   const [showModal, setShowModal] = useState(false)
   const [editItem, setEditItem] = useState(null)
@@ -331,14 +331,28 @@ export default function CrudManager({ config }) {
       addToast('Peringatan: Galeri Gambar kosong — detail mobil tidak akan menampilkan gambar.', 'error')
     }
     const exists = items.find(i => i.id === item.id)
-    if (exists) { update(config.type, item.id, item); addToast(`${config.label} diperbarui`, 'success') }
-    else { add(config.type, item); addToast(`${config.label} ditambahkan`, 'success') }
+    if (exists) {
+      update(config.type, item.id, item)
+      saveNow({ ...data, [config.type]: data[config.type].map(i => i.id === item.id ? item : i) })
+      addToast(`${config.label} diperbarui`, 'success')
+    } else {
+      add(config.type, item)
+      saveNow({ ...data, [config.type]: [...(data[config.type] || []), item] })
+      addToast(`${config.label} ditambahkan`, 'success')
+    }
   }
 
-  const handleDelete = (id) => { remove(config.type, id); setConfirmDelete(null); addToast(`${config.label} dihapus`, 'success') }
+  const handleDelete = (id) => {
+    remove(config.type, id)
+    saveNow({ ...data, [config.type]: (data[config.type] || []).filter(i => i.id !== id) })
+    setConfirmDelete(null)
+    addToast(`${config.label} dihapus`, 'success')
+  }
 
   const handleBatchDelete = () => {
-    selectedIds.forEach(id => remove(config.type, id))
+    const ids = new Set(selectedIds)
+    saveNow({ ...data, [config.type]: (data[config.type] || []).filter(i => !ids.has(i.id)) })
+    ids.forEach(id => remove(config.type, id))
     const count = selectedIds.size
     clearSelection()
     setConfirmBatchDelete(false)
