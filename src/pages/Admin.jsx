@@ -556,16 +556,17 @@ function AdminGaleri() {
 }
 
 function AdminNavbar() {
-  const { data, updateNavbar } = useData()
+  const { data, updateNavbar, saveNow } = useData()
   const { addToast } = useToast()
   const [form, setForm] = useState({ menuItems: [], ...data.navbar, loading: { ...data.loadingScreen } })
 
   useEffect(() => { setForm({ menuItems: [], ...data.navbar, loading: { ...data.loadingScreen } }) }, [data.navbar, data.loadingScreen])
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const { menuItems, logoImage, logoText, logoSubtext, ctaText, ctaUrl, loading } = form
     updateNavbar({ menuItems, logoImage, logoText, logoSubtext, ctaText, ctaUrl, loading })
-    addToast('Berhasil disimpan', 'success')
+    const ok = await saveNow()
+    addToast(ok ? 'Berhasil disimpan' : 'Gagal menyimpan ke server', ok ? 'success' : 'error')
   }
   const addMenuItem = () => setForm(prev => ({ ...prev, menuItems: [...prev.menuItems, { label: '', section: '' }] }))
   const removeMenuItem = (i) => setForm(prev => ({ ...prev, menuItems: prev.menuItems.filter((_, idx) => idx !== i) }))

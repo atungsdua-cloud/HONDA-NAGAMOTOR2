@@ -156,12 +156,36 @@ export function DataProvider({ children }) {
     setLastUpdate(Date.now())
   }, [])
 
+  const saveNow = useCallback(async () => {
+    if (saveTimer.current) clearTimeout(saveTimer.current)
+    try {
+      const res = await fetch(API_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      })
+      if (res.ok) {
+        setSaveError(null)
+        return true
+      } else {
+        const errBody = await res.json().catch(() => ({}))
+        console.error('Save error:', res.status, errBody)
+        setSaveError(errBody.error || `Gagal menyimpan ke server (HTTP ${res.status})`)
+        return false
+      }
+    } catch {
+      setSaveError('Server tidak tersedia. Data disimpan di browser saja.')
+      return false
+    }
+  }, [data])
+
   return (
     <DataContext.Provider value={{
       data,
       loading,
       lastUpdate,
       saveError,
+      saveNow,
       getByType,
       getByTypeAndId,
       add,
