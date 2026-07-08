@@ -2,8 +2,8 @@
   RewriteEngine On
   RewriteBase /
 
-  # bypass API routes — Hostinger proxy forwards these to Node.js
-  RewriteRule ^api/ - [L]
+  # route API requests to PHP handler
+  RewriteRule ^api/data$ api/data.php [L,QSA]
 
   RewriteRule ^index\.html$ - [L]
   RewriteCond %{REQUEST_FILENAME} !-f
