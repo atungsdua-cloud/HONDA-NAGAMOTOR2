@@ -227,7 +227,7 @@ function AdminHero() {
 
   const handleSave = () => {
     updateHero(form)
-    saveNow({ ...data, hero: { ...data.hero, ...form } })
+    saveNow({ hero: { ...data.hero, ...form } })
     addToast('Hero berhasil diperbarui', 'success')
   }
 
@@ -315,7 +315,7 @@ function AdminProfile() {
 
   const handleSave = () => {
     updateProfile(form)
-    saveNow({ ...data, profile: { ...data.profile, ...form } })
+    saveNow({ profile: { ...data.profile, ...form } })
     addToast('Profil berhasil diperbarui', 'success')
   }
 
@@ -573,12 +573,10 @@ function AdminNavbar() {
   const handleSave = () => {
     const { menuItems, logoImage, logoText, logoSubtext, ctaText, ctaUrl, loading } = form
     updateNavbar({ menuItems, logoImage, logoText, logoSubtext, ctaText, ctaUrl, loading })
-    const updated = {
-      ...data,
+    saveNow({
       navbar: { ...data.navbar, menuItems, logoImage, logoText, logoSubtext, ctaText, ctaUrl },
       loadingScreen: { ...data.loadingScreen, ...loading },
-    }
-    saveNow(updated)
+    })
     addToast('Berhasil disimpan', 'success')
   }
   const addMenuItem = () => setForm(prev => ({ ...prev, menuItems: [...prev.menuItems, { label: '', section: '' }] }))
@@ -716,7 +714,7 @@ function AdminContact() {
 
   const handleSave = () => {
     updateContact(form)
-    saveNow({ ...data, contact: { ...data.contact, ...form } })
+    saveNow({ contact: { ...data.contact, ...form } })
     addToast('Kontak berhasil diperbarui', 'success')
   }
 

@@ -333,25 +333,25 @@ export default function CrudManager({ config }) {
     const exists = items.find(i => i.id === item.id)
     if (exists) {
       update(config.type, item.id, item)
-      saveNow({ ...data, [config.type]: data[config.type].map(i => i.id === item.id ? item : i) })
+      saveNow({ [config.type]: data[config.type].map(i => i.id === item.id ? item : i) })
       addToast(`${config.label} diperbarui`, 'success')
     } else {
       add(config.type, item)
-      saveNow({ ...data, [config.type]: [...(data[config.type] || []), item] })
+      saveNow({ [config.type]: [...(data[config.type] || []), item] })
       addToast(`${config.label} ditambahkan`, 'success')
     }
   }
 
   const handleDelete = (id) => {
     remove(config.type, id)
-    saveNow({ ...data, [config.type]: (data[config.type] || []).filter(i => i.id !== id) })
+    saveNow({ [config.type]: (data[config.type] || []).filter(i => i.id !== id) })
     setConfirmDelete(null)
     addToast(`${config.label} dihapus`, 'success')
   }
 
   const handleBatchDelete = () => {
     const ids = new Set(selectedIds)
-    saveNow({ ...data, [config.type]: (data[config.type] || []).filter(i => !ids.has(i.id)) })
+    saveNow({ [config.type]: (data[config.type] || []).filter(i => !ids.has(i.id)) })
     ids.forEach(id => remove(config.type, id))
     const count = selectedIds.size
     clearSelection()
