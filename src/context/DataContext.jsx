@@ -34,6 +34,7 @@ export function DataProvider({ children }) {
   useEffect(() => {
     if (initialized.current) return
     initialized.current = true
+    const startTime = Date.now()
     ;(async () => {
       try {
         const res = await fetch(API_ENDPOINT)
@@ -41,12 +42,18 @@ export function DataProvider({ children }) {
           const saved = await res.json()
           if (saved && Object.keys(saved).length > 0) {
             setData(mergeData(saved))
-            setLoading(false)
-            return
+          } else {
+            setData(loadLocal())
           }
+        } else {
+          setData(loadLocal())
         }
-      } catch {}
-      setData(loadLocal())
+      } catch {
+        setData(loadLocal())
+      }
+      const elapsed = Date.now() - startTime
+      const remaining = Math.max(0, 800 - elapsed)
+      if (remaining > 0) await new Promise(r => setTimeout(r, remaining))
       setLoading(false)
     })()
   }, [])

@@ -272,50 +272,74 @@ async function initDatabase() {
 // seedData telah dihapus — hanya gunakan data asli dari database
 
 async function readData() {
-  const [profile] = await pool.query('SELECT * FROM profile WHERE id = 1')
-  const [profileStats] = await pool.query('SELECT icon, value, label FROM profile_stats WHERE profile_id = 1 ORDER BY sort_order')
+  const [
+    [profile],
+    [profileStats],
+    [hero],
+    [heroImages],
+    [heroStats],
+    [navbar],
+    [menuItems],
+    [loading],
+    [contact],
+    [socialMedia],
+    [products],
+    [promotions],
+    [testimonials],
+    [gallery],
+    [faqs],
+    [advantages],
+    [allVariants],
+    [allImages],
+  ] = await Promise.all([
+    pool.query('SELECT * FROM profile WHERE id = 1'),
+    pool.query('SELECT icon, value, label FROM profile_stats WHERE profile_id = 1 ORDER BY sort_order'),
+    pool.query('SELECT * FROM hero WHERE id = 1'),
+    pool.query('SELECT url FROM hero_images WHERE hero_id = 1 ORDER BY sort_order'),
+    pool.query('SELECT icon, value, label, suffix FROM hero_stats WHERE hero_id = 1 ORDER BY sort_order'),
+    pool.query('SELECT * FROM navbar WHERE id = 1'),
+    pool.query('SELECT label, section FROM navbar_menu_items WHERE navbar_id = 1 ORDER BY sort_order'),
+    pool.query('SELECT * FROM loading_screen WHERE id = 1'),
+    pool.query('SELECT * FROM contact WHERE id = 1'),
+    pool.query('SELECT platform, url, icon FROM contact_social_media WHERE contact_id = 1 ORDER BY sort_order'),
+    pool.query('SELECT id, name, tagline, type, engine, fuel, image, description, specs_json, features_json, colors_json, price, theme_json FROM products ORDER BY id'),
+    pool.query('SELECT id, title, description, image, discount, valid_until AS validUntil, color FROM promotions ORDER BY id'),
+    pool.query('SELECT id, name, car, photo, text, rating FROM testimonials ORDER BY id'),
+    pool.query('SELECT id, src, alt FROM gallery ORDER BY sort_order'),
+    pool.query('SELECT id, question, answer FROM faqs ORDER BY sort_order'),
+    pool.query('SELECT id, icon, title, description FROM advantages ORDER BY sort_order'),
+    pool.query('SELECT product_id, name, price FROM product_variants ORDER BY product_id, sort_order'),
+    pool.query('SELECT product_id, url FROM product_images ORDER BY product_id, sort_order'),
+  ])
 
-  const [hero] = await pool.query('SELECT * FROM hero WHERE id = 1')
-  const [heroImages] = await pool.query('SELECT url FROM hero_images WHERE hero_id = 1 ORDER BY sort_order')
-  const [heroStats] = await pool.query('SELECT icon, value, label, suffix FROM hero_stats WHERE hero_id = 1 ORDER BY sort_order')
-
-  const [navbar] = await pool.query('SELECT * FROM navbar WHERE id = 1')
-  const [menuItems] = await pool.query('SELECT label, section FROM navbar_menu_items WHERE navbar_id = 1 ORDER BY sort_order')
-
-  const [loading] = await pool.query('SELECT * FROM loading_screen WHERE id = 1')
-
-  const [contact] = await pool.query('SELECT * FROM contact WHERE id = 1')
-  const [socialMedia] = await pool.query('SELECT platform, url, icon FROM contact_social_media WHERE contact_id = 1 ORDER BY sort_order')
-
-  const [products] = await pool.query('SELECT id, name, tagline, type, engine, fuel, image, description, specs_json, features_json, colors_json, price, theme_json FROM products ORDER BY id')
-  const productsWithVariants = []
-  for (const p of products) {
-    const [variants] = await pool.query('SELECT name, price FROM product_variants WHERE product_id = ? ORDER BY sort_order', [p.id])
-    const [images] = await pool.query('SELECT url FROM product_images WHERE product_id = ? ORDER BY sort_order', [p.id])
-    productsWithVariants.push({
-      id: `product-${p.id}`,
-      name: p.name,
-      tagline: p.tagline,
-      type: p.type,
-      engine: p.engine,
-      fuel: p.fuel,
-      image: p.image,
-      images: images.map(i => i.url),
-      description: p.description,
-      specs: JSON.parse(p.specs_json || '{}'),
-      features: JSON.parse(p.features_json || '[]'),
-      colors: JSON.parse(p.colors_json || '[]'),
-      price: p.price,
-      theme: JSON.parse(p.theme_json || '{}'),
-      variants
-    })
+  const variantsByProduct = {}
+  for (const v of allVariants) {
+    if (!variantsByProduct[v.product_id]) variantsByProduct[v.product_id] = []
+    variantsByProduct[v.product_id].push({ name: v.name, price: v.price })
+  }
+  const imagesByProduct = {}
+  for (const i of allImages) {
+    if (!imagesByProduct[i.product_id]) imagesByProduct[i.product_id] = []
+    imagesByProduct[i.product_id].push(i.url)
   }
 
-  const [promotions] = await pool.query('SELECT id, title, description, image, discount, valid_until AS validUntil, color FROM promotions ORDER BY id')
-  const [testimonials] = await pool.query('SELECT id, name, car, photo, text, rating FROM testimonials ORDER BY id')
-  const [gallery] = await pool.query('SELECT id, src, alt FROM gallery ORDER BY sort_order')
-  const [faqs] = await pool.query('SELECT id, question, answer FROM faqs ORDER BY sort_order')
-  const [advantages] = await pool.query('SELECT id, icon, title, description FROM advantages ORDER BY sort_order')
+  const productsWithVariants = products.map(p => ({
+    id: `product-${p.id}`,
+    name: p.name,
+    tagline: p.tagline,
+    type: p.type,
+    engine: p.engine,
+    fuel: p.fuel,
+    image: p.image,
+    images: imagesByProduct[p.id] || [],
+    description: p.description,
+    specs: JSON.parse(p.specs_json || '{}'),
+    features: JSON.parse(p.features_json || '[]'),
+    colors: JSON.parse(p.colors_json || '[]'),
+    price: p.price,
+    theme: JSON.parse(p.theme_json || '{}'),
+    variants: variantsByProduct[p.id] || []
+  }))
 
   return {
     profile: {
