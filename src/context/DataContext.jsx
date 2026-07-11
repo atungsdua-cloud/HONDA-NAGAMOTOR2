@@ -28,6 +28,7 @@ export function DataProvider({ children }) {
   const [loading, setLoading] = useState(true)
   const saveTimer = useRef(null)
   const initialized = useRef(false)
+  const dataRef = useRef(data)
 
   useEffect(() => {
     dataRef.current = data
