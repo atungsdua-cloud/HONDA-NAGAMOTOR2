@@ -74,7 +74,8 @@ export default function Testimoni() {
                       src={testimonials[current]?.photo || 'https://placehold.co/160x160?text=User'}
                       alt={testimonials[current]?.name || 'Testimoni'}
                       className="w-32 h-32 sm:w-40 sm:h-40 rounded-2xl object-cover ring-4 ring-honda-red/20 shadow-lg"
-                      onError={(e) => { if (e.target.src !== 'https://placehold.co/160x160?text=User') e.target.src = 'https://placehold.co/160x160?text=User' }}
+                      data-fallback="https://placehold.co/160x160?text=User"
+                      onError={(e) => { e.target.onerror = null; e.target.src = e.target.dataset.fallback || 'https://placehold.co/160x160?text=User'; }}
                     />
                   </div>
                   <div className="flex-1 text-center md:text-left">

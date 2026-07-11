@@ -103,7 +103,8 @@ function FeaturedImage({ images, slideIndex, setSlideIndex, onImageClick }) {
             src={images[slideIndex]}
             alt=""
             className="w-full h-[50vh] sm:h-[60vh] lg:h-[70vh] object-cover transition-transform duration-700 group-hover:scale-105"
-            onError={(e) => { if (e.target.src !== 'https://placehold.co/1200x800?text=No+Image') e.target.src = 'https://placehold.co/1200x800?text=No+Image' }}
+            data-fallback="https://placehold.co/1200x800?text=No+Image"
+            onError={(e) => { e.target.onerror = null; e.target.src = e.target.dataset.fallback || 'https://placehold.co/1200x800?text=No+Image'; }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
 
@@ -137,7 +138,8 @@ function FeaturedImage({ images, slideIndex, setSlideIndex, onImageClick }) {
                   i === slideIndex ? 'border-honda-red ring-1 ring-honda-red/30 shadow-lg' : 'border-transparent opacity-50 hover:opacity-100'
                 }`}>
                 <img src={img} alt="" className="w-full h-full object-cover" loading="lazy"
-                  onError={(e) => { if (e.target.src !== 'https://placehold.co/160x112?text=No+Image') e.target.src = 'https://placehold.co/160x112?text=No+Image' }} />
+                  data-fallback="https://placehold.co/160x112?text=No+Image"
+                  onError={(e) => { e.target.onerror = null; e.target.src = e.target.dataset.fallback || 'https://placehold.co/160x112?text=No+Image'; }} />
               </button>
             ))}
           </div>
@@ -158,7 +160,8 @@ function ImageGallery({ images, onImageClick, accent }) {
             className="relative rounded-2xl overflow-hidden aspect-[4/3] group cursor-pointer bg-gray-100 dark:bg-gray-700">
             <img src={img} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               loading="lazy"
-              onError={(e) => { if (e.target.src !== 'https://placehold.co/600x450?text=Foto') e.target.src = 'https://placehold.co/600x450?text=Foto' }} />
+              data-fallback="https://placehold.co/600x450?text=Foto"
+              onError={(e) => { e.target.onerror = null; e.target.src = e.target.dataset.fallback || 'https://placehold.co/600x450?text=Foto'; }} />
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
             <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               <div className="w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center">
@@ -349,7 +352,7 @@ function CustomHeroLayout({ product, keySpecs, theme }) {
   )
 }
 
-function renderCustomLayout(product, images, specs, features, colors, keySpecs, detailSpecs, slideIndex, setSlideIndex, lightboxIndex, handleLightbox, related, theme) {
+function renderCustomLayout(product, images, specs, features, colors, keySpecs, _detailSpecs, slideIndex, setSlideIndex, lightboxIndex, handleLightbox, related, theme) {
 
   return (
     <PageTransition>
@@ -477,7 +480,8 @@ function renderStandardLayout(product, images, specs, features, colors, keySpecs
               <div className="relative rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-800 cursor-pointer group"
                 onClick={() => setLightboxIndex(slideIndex)}>
                 <img key={images[slideIndex] || 'no-img'} src={images[slideIndex]} alt={product.name}
-                  onError={(e) => { if (e.target.src !== 'https://placehold.co/800x600?text=No+Image') e.target.src = 'https://placehold.co/800x600?text=No+Image' }}
+                  data-fallback="https://placehold.co/800x600?text=No+Image"
+                  onError={(e) => { e.target.onerror = null; e.target.src = e.target.dataset.fallback || 'https://placehold.co/800x600?text=No+Image'; }}
                   className="w-full h-80 sm:h-[28rem] object-cover transition-transform duration-700 group-hover:scale-105" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
                 <div className="absolute top-4 left-4 px-3 py-1.5 bg-white/90 backdrop-blur-sm text-gray-900 text-xs font-semibold rounded-full flex items-center gap-1.5">
@@ -511,7 +515,7 @@ function renderStandardLayout(product, images, specs, features, colors, keySpecs
                       className={`flex-shrink-0 w-[72px] h-[56px] rounded-xl overflow-hidden border-2 transition-all ${
                         i === slideIndex ? 'border-honda-red ring-1 ring-honda-red/30' : 'border-transparent opacity-50 hover:opacity-100'
                       }`}>
-                      <img src={img} alt="" className="w-full h-full object-cover" loading="lazy" onError={(e) => { if (e.target.src !== 'https://placehold.co/144x112?text=No+Image') e.target.src = 'https://placehold.co/144x112?text=No+Image' }} />
+                      <img src={img} alt="" className="w-full h-full object-cover" loading="lazy" data-fallback="https://placehold.co/144x112?text=No+Image" onError={(e) => { e.target.onerror = null; e.target.src = e.target.dataset.fallback || 'https://placehold.co/144x112?text=No+Image'; }} />
                     </button>
                   ))}
                 </div>
@@ -638,7 +642,8 @@ function renderStandardLayout(product, images, specs, features, colors, keySpecs
                       <img src={p.image || p.images?.[0]} alt={p.name}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                         loading="lazy"
-                        onError={(e) => { if (e.target.src !== 'https://placehold.co/600x400?text=No+Image') e.target.src = 'https://placehold.co/600x400?text=No+Image' }} />
+                        data-fallback="https://placehold.co/600x400?text=No+Image"
+                        onError={(e) => { e.target.onerror = null; e.target.src = e.target.dataset.fallback || 'https://placehold.co/600x400?text=No+Image'; }} />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                       <div className="absolute top-3 left-3 px-2.5 py-1 bg-white/90 dark:bg-gray-900/80 backdrop-blur-sm text-gray-900 dark:text-white text-[10px] font-semibold rounded-full">{p.type}</div>
                     </div>
@@ -737,7 +742,7 @@ export default function ProductDetail() {
   const detailSpecs = Object.entries(specs).filter(([k]) => !keySpecKeys.includes(k))
 
   const theme = product.theme
-  const hasTheme = theme?.accent
+  const hasTheme = theme?.accent != null && theme.accent !== ''
   if (hasTheme) {
     return renderCustomLayout(product, images, specs, features, colors, keySpecs, detailSpecs, slideIndex, setSlideIndex, lightboxIndex, handleLightbox, related, theme)
   }

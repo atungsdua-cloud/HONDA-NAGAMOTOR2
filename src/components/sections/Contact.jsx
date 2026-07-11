@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { FiSend, FiCheck, FiPhone, FiMail, FiMapPin } from 'react-icons/fi'
+import { FiSend, FiCheck, FiAlertCircle, FiPhone, FiMail, FiMapPin } from 'react-icons/fi'
 import { FaInstagram, FaFacebook, FaTiktok } from 'react-icons/fa'
 import { useData } from '../../context/DataContext'
 import SectionTitle from '../ui/SectionTitle'
@@ -15,21 +15,27 @@ export default function Contact() {
   const [form, setForm] = useState({ name: '', phone: '', product: '', message: '' })
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)
+  const [sendError, setSendError] = useState('')
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setSending(true)
+    setSendError('')
     try {
-      await fetch('/api/contact', {
+      const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form)
       })
-      setSent(true)
-      setForm({ name: '', phone: '', product: '', message: '' })
-      setTimeout(() => setSent(false), 5000)
+      if (!res.ok) {
+        setSendError('Data tidak tersimpan di server, tapi pesan WhatsApp tetap terkirim.')
+      } else {
+        setSent(true)
+        setForm({ name: '', phone: '', product: '', message: '' })
+        setTimeout(() => setSent(false), 5000)
+      }
     } catch {
-      // tetap buka WhatsApp walau simpan gagal
+      setSendError('Server tidak tersedia, tapi pesan WhatsApp tetap terkirim.')
     }
     const text = `Hallo Kak, saya ${form.name} (${form.phone}), tertarik dengan ${form.product || 'mobil Honda'}. ${form.message ? `Pesan: ${form.message}` : ''}`
     window.open(getWhatsAppLink(text), '_blank')
@@ -103,6 +109,12 @@ export default function Contact() {
               />
             </div>
 
+            {sendError && (
+              <div className="flex items-start gap-2 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-xl text-xs text-yellow-700 dark:text-yellow-300">
+                <FiAlertCircle size={14} className="mt-0.5 flex-shrink-0" />
+                <span>{sendError}</span>
+              </div>
+            )}
             <motion.button
               type="submit"
               disabled={sending}

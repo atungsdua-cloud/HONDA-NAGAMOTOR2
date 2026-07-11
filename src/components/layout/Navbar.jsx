@@ -98,7 +98,7 @@ export default function Navbar() {
                 <img
                   src={logoImage}
                   alt={logoText}
-                  className="h-10 sm:h-11 w-auto object-contain"
+                  className="h-10 sm:h-11 w-auto object-contain drop-shadow-[0_0_4px_rgba(0,0,0,0.3)]"
                 />
               ) : (
                 <div className="relative">

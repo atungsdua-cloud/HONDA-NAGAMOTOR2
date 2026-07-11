@@ -109,8 +109,8 @@ async function migrate() {
     await conn.query('DELETE FROM contact_social_media WHERE contact_id = 1')
     await conn.query('DELETE FROM contact')
     await conn.query(
-      'INSERT INTO contact (id, phone, email, address, map_url) VALUES (1, ?, ?, ?, ?)',
-      [c.phone || '', c.email || '', c.address || '', c.mapUrl || '']
+      'INSERT INTO contact (id, phone, email, address, map_url, hours_json) VALUES (1, ?, ?, ?, ?, ?)',
+      [c.phone || '', c.email || '', c.address || '', c.mapUrl || '', JSON.stringify(c.hours || {})]
     )
     if (c.socialMedia) {
       for (let i = 0; i < c.socialMedia.length; i++) {
@@ -125,10 +125,11 @@ async function migrate() {
     await conn.query('DELETE FROM products')
     for (const p of data.products) {
       const [result] = await conn.query(
-        `INSERT INTO products (name, tagline, type, engine, fuel, image, description, specs_json, features_json, colors_json, price)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO products (name, tagline, type, engine, fuel, image, description, specs_json, features_json, colors_json, price, theme_json)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [p.name, p.tagline || '', p.type || '', p.engine || '', p.fuel || '', p.image || '', p.description || '',
-         JSON.stringify(p.specs || {}), JSON.stringify(p.features || []), JSON.stringify(p.colors || []), p.price || '']
+         JSON.stringify(p.specs || {}), JSON.stringify(p.features || []), JSON.stringify(p.colors || []), p.price || '',
+         JSON.stringify(p.theme || {})]
       )
       if (p.variants) {
         for (let i = 0; i < p.variants.length; i++) {

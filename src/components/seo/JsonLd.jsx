@@ -1,3 +1,4 @@
+import { useLocation } from 'react-router-dom'
 import { useData } from '../../context/DataContext'
 
 export function ProductJsonLd({ product }) {
@@ -87,12 +88,14 @@ export function LocalBusinessJsonLd() {
 
 export default function StructuredData() {
   const { data } = useData()
+  const location = useLocation()
+  const isProductPage = location.pathname.startsWith('/produk/')
   return (
     <>
       <LocalBusinessJsonLd />
       <ReviewJsonLd testimonials={data.testimonials} />
       <FaqJsonLd faqs={data.faqs} />
-      {(data.products || []).map(p => (
+      {isProductPage && (data.products || []).map(p => (
         <ProductJsonLd key={p.id} product={p} />
       ))}
     </>

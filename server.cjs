@@ -10,20 +10,44 @@ const pool = mysql.createPool({
   database: process.env.DB_NAME || 'honda_nagamotor',
   port: parseInt(process.env.DB_PORT || '3306'),
   waitForConnections: true,
-  connectionLimit: 10,
+  connectionLimit: 20,
   queueLimit: 0,
 })
 
 const app = express()
 const PORT = process.env.PORT || 3000
+const ADMIN_API_KEY = process.env.ADMIN_API_KEY || ''
 
-app.use(express.json({ limit: '50mb' }))
+function safeJson(val, fallback) {
+  try { return JSON.parse(val) } catch { return fallback }
+}
+
+function requireAdmin(req, res, next) {
+  if (!ADMIN_API_KEY) return next()
+  const key = req.headers['x-api-key']
+  if (!key || key !== ADMIN_API_KEY)
+    return res.status(401).json({ error: 'Unauthorized' })
+  next()
+}
+
+app.use(express.json({ limit: '5mb' }))
 
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*')
+  const allowedOrigins = process.env.NODE_ENV === 'production'
+    ? ['https://honda-nagamotor.vercel.app', process.env.FRONTEND_URL].filter(Boolean)
+    : ['http://localhost:5173', 'http://localhost:3000']
+  const origin = req.headers.origin
+  if (origin && allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin)
+  } else if (!origin) {
+    res.setHeader('Access-Control-Allow-Origin', '*')
+  }
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
-  if (req.method === 'OPTIONS') return res.sendStatus(200)
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-API-Key')
+  res.setHeader('X-Content-Type-Options', 'nosniff')
+  res.setHeader('X-Frame-Options', 'DENY')
+  res.setHeader('X-XSS-Protection', '1; mode=block')
+  if (req.method === 'OPTIONS') return res.sendStatus(204)
   next()
 })
 
@@ -37,7 +61,7 @@ app.get('/api/data', async (req, res) => {
   }
 })
 
-app.post('/api/data', async (req, res) => {
+app.post('/api/data', requireAdmin, async (req, res) => {
   const body = req.body
   if (!body || typeof body !== 'object')
     return res.status(400).json({ error: 'Data tidak valid' })
@@ -333,11 +357,11 @@ async function readData() {
     image: p.image,
     images: imagesByProduct[p.id] || [],
     description: p.description,
-    specs: JSON.parse(p.specs_json || '{}'),
-    features: JSON.parse(p.features_json || '[]'),
-    colors: JSON.parse(p.colors_json || '[]'),
+    specs: safeJson(p.specs_json, {}),
+    features: safeJson(p.features_json, []),
+    colors: safeJson(p.colors_json, []),
     price: p.price,
-    theme: JSON.parse(p.theme_json || '{}'),
+    theme: safeJson(p.theme_json, {}),
     variants: variantsByProduct[p.id] || []
   }))
 
@@ -378,7 +402,7 @@ async function readData() {
       email: contact[0]?.email || '',
       address: contact[0]?.address || '',
       mapUrl: contact[0]?.map_url || '',
-      hours: JSON.parse(contact[0]?.hours_json || '{}'),
+      hours: safeJson(contact[0]?.hours_json, {}),
       socialMedia
     },
     products: productsWithVariants,

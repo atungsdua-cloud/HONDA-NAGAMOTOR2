@@ -33,7 +33,8 @@ export default function Galeri() {
                 src={item.src}
                 alt={item.alt}
                 loading="lazy"
-                onError={(e) => { if (e.target.src !== 'https://placehold.co/600x800?text=No+Image') e.target.src = 'https://placehold.co/600x800?text=No+Image' }}
+                data-fallback="https://placehold.co/600x800?text=No+Image"
+                onError={(e) => { e.target.onerror = null; e.target.src = e.target.dataset.fallback || 'https://placehold.co/600x800?text=No+Image'; }}
                 className="w-full h-auto object-cover group-hover:scale-110 transition-transform duration-700"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">

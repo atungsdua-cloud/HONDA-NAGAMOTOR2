@@ -7,11 +7,16 @@ import { getWhatsAppLink } from '../../utils/whatsapp'
 
 function CountdownTimer({ targetDate }) {
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 })
+  const [expired, setExpired] = useState(false)
 
   useEffect(() => {
     const calculate = () => {
       const diff = new Date(targetDate).getTime() - Date.now()
-      if (diff <= 0) return
+      if (diff <= 0) {
+        setExpired(true)
+        return
+      }
+      setExpired(false)
       setTimeLeft({
         days: Math.floor(diff / (1000 * 60 * 60 * 24)),
         hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
@@ -23,6 +28,15 @@ function CountdownTimer({ targetDate }) {
     const interval = setInterval(calculate, 1000)
     return () => clearInterval(interval)
   }, [targetDate])
+
+  if (expired) {
+    return (
+      <div className="flex items-center gap-2 text-xs font-medium text-red-300">
+        <FiClock size={14} />
+        <span>Promo Berakhir</span>
+      </div>
+    )
+  }
 
   return (
     <div className="flex items-center gap-2 text-xs font-medium text-white/80">
@@ -67,7 +81,8 @@ export default function Promo() {
             >
               <div className="absolute inset-0">
                 <img src={promo.image} alt={promo.title} className="w-full h-full object-cover" loading="lazy"
-                  onError={(e) => { if (e.target.src !== 'https://placehold.co/800x600?text=Promo') e.target.src = 'https://placehold.co/800x600?text=Promo' }} />
+                  data-fallback="https://placehold.co/800x600?text=Promo"
+                  onError={(e) => { e.target.onerror = null; e.target.src = e.target.dataset.fallback || 'https://placehold.co/800x600?text=Promo'; }} />
                 <div className={`absolute inset-0 bg-gradient-to-r ${promo.color} opacity-80 mix-blend-multiply`} />
               </div>
 

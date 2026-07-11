@@ -28,8 +28,10 @@ export function DataProvider({ children }) {
   const [loading, setLoading] = useState(true)
   const saveTimer = useRef(null)
   const initialized = useRef(false)
-  const dataRef = useRef(data)
-  dataRef.current = data
+
+  useEffect(() => {
+    dataRef.current = data
+  }, [data])
 
   useEffect(() => {
     if (initialized.current) return

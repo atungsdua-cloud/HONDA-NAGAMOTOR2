@@ -7,7 +7,6 @@
     "dev": "vite",
     "dev:server": "concurrently -n \"vite,express\" -c \"cyan,green\" \"vite\" \"node server.cjs\"",
     "build": "vite build",
-    "postinstall": "npm run build",
     "start": "node server.cjs",
     "preview": "vite preview",
     "migrate": "node migrate.cjs"

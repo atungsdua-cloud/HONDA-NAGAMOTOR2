@@ -1,7 +1,6 @@
-const FALLBACK_PHONE = '6281234567890'
-
 export function getWhatsAppLink(message = '', phone) {
-  const number = phone || FALLBACK_PHONE
+  if (!phone) return '#'
+  const number = phone.replace(/\D/g, '')
   const text = encodeURIComponent(message || 'Hallo Kak, saya tertarik dengan mobil Honda.')
   return `https://wa.me/${number}?text=${text}`
 }
