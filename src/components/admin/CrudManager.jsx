@@ -395,9 +395,15 @@ export default function CrudManager({ config }) {
   }
 
   const handleSave = (item) => {
+    if (item.images && item.images.length > 0 && !item.image) {
+      item.image = item.images[0]
+    }
+    if (item.image && (!item.images || item.images.length === 0)) {
+      item.images = [item.image]
+    }
     const hasImagesField = config.fields.some(f => f.key === 'images')
     if (hasImagesField && (!item.images || item.images.length === 0)) {
-      addToast('Peringatan: Galeri Gambar kosong — detail mobil tidak akan menampilkan gambar.', 'error')
+      addToast('Peringatan: Gambar produk kosong', 'error')
     }
     const exists = items.find(i => i.id === item.id)
     if (exists) {
